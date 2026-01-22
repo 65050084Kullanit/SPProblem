@@ -16,6 +16,13 @@ import GameAnalysis from "./pages/GameAnalysis";
 import Poll from "./pages/Poll";
 import OpenChat from "./pages/OpenChat";
 
+import OneSquare from "./pages/OneAnsSquare";
+import OneSquare2 from "./pages/OneAnsSquare2";
+import MultiSquare from "./pages/MultiAnsSquare";
+import MultiSquare2 from "./pages/MultiAnsSquare2";
+
+
+
 
 
 
@@ -37,6 +44,12 @@ function App() {
         <Route path="/analysis" element={<GameAnalysis />} />
         <Route path="/poll" element={<Poll />} />
         <Route path="/chat" element={<OpenChat />} />
+        <Route path="/1square" element={<OneSquare />} />
+        <Route path="/1square2" element={<OneSquare2 />} />
+        <Route path="/msquare" element={<MultiSquare />} />
+        <Route path="/msquare2" element={<MultiSquare2 />} />
+
+
 
         
       </Routes>
