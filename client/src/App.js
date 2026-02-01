@@ -32,9 +32,9 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<JoinRoom />} />
-        <Route path="/class/:code" element={<StudentID />} />
-        <Route path="/class/:code/student/:studentId/avatar" element={<SelectAvatar />} />
-        <Route path="/class/:code/lobby" element={<Lobby />} />
+        <Route path="/class/:joinCode" element={<StudentID />} />
+        <Route path="/class/:joinCode/student/:studentId/avatar" element={<SelectAvatar />} />
+        <Route path="/class/:joinCode/lobby" element={<Lobby />} />
 
         <Route path="/1quiz" element={<OneAnsQuizPage />} />
         <Route path="/mquiz" element={<MultiAnsQuizPage />} />
