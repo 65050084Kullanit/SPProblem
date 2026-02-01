@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../socket";
 
 
@@ -8,6 +8,8 @@ const Lobby = () => {
   const { playerData,joinCode } = location.state || {};
   const [players, setPlayers] = useState([]);
   const currentUser = playerData;
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (!playerData || !joinCode) return;
@@ -41,6 +43,30 @@ const Lobby = () => {
   socket.emit("get_active_activity", {
     classId: 1
   });
+
+  useEffect(() => {
+    const handler = (payload) => {
+      console.log("🎯 activity_started", payload);
+      console.log("activity_started payload =", payload);
+
+      navigate(`/class/${joinCode}/lobby/quiz/${payload.activitySessionId}`,{
+          state: {
+            questions: payload.questions,
+            questionIndex: 0,                     // ⭐ เริ่มข้อแรก
+            totalQuestions: payload.questions.length,
+            timeLimit: payload.timeLimit,
+            timerType: payload.timerType,
+            activitySessionId: payload.activitySessionId
+          }
+      });
+    };
+
+    socket.on("activity_started", handler);
+
+    return () => socket.off("activity_started", handler);
+  }, []);
+
+
 
 
 

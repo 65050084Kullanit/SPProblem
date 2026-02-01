@@ -5,9 +5,10 @@ import JoinRoom from "./pages/JoinRoom";
 import StudentID from "./pages/StudentID";
 import SelectAvatar from "./pages/SelectAvatar";
 import Lobby from "./pages/Lobby";
+import QuizPage from "./pages/QuizPage";
 
 
-import OneAnsQuizPage from "./pages/OneAnsQuizPage";
+import OneAnsQuizPage from "./pages/OneAnsQuizPage3";
 import MultiAnsQuizPage from "./pages/MultiAnsQuizPage";
 import AnswerResultPage from "./pages/AnswerResultPage";
 import RankingPage from "./pages/RankingPage";
@@ -35,6 +36,7 @@ function App() {
         <Route path="/class/:joinCode" element={<StudentID />} />
         <Route path="/class/:joinCode/student/:studentId/avatar" element={<SelectAvatar />} />
         <Route path="/class/:joinCode/lobby" element={<Lobby />} />
+        <Route path="/class/:joinCode/lobby/quiz/:activitySessionId" element={<QuizPage />} />
 
         <Route path="/1quiz" element={<OneAnsQuizPage />} />
         <Route path="/mquiz" element={<MultiAnsQuizPage />} />
