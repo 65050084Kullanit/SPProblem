@@ -6,13 +6,13 @@ import StudentID from "./pages/StudentID";
 import SelectAvatar from "./pages/SelectAvatar";
 import Lobby from "./pages/Lobby";
 import QuizPage from "./pages/QuizPage";
+import EndQuizPage from "./pages/EndQuizPage";
 
 
 import OneAnsQuizPage from "./pages/OneAnsQuizPage3";
 import MultiAnsQuizPage from "./pages/MultiAnsQuizPage";
 import AnswerResultPage from "./pages/AnswerResultPage";
 import RankingPage from "./pages/RankingPage";
-import EndQuizPage from "./pages/EndQuizPage";
 import GameAnalysis from "./pages/GameAnalysis";
 import Poll from "./pages/Poll";
 import OpenChat from "./pages/OpenChat";
@@ -37,6 +37,8 @@ function App() {
         <Route path="/class/:joinCode/student/:studentId/avatar" element={<SelectAvatar />} />
         <Route path="/class/:joinCode/lobby" element={<Lobby />} />
         <Route path="/class/:joinCode/lobby/quiz/:activitySessionId" element={<QuizPage />} />
+        <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end" element={<EndQuizPage />} />
+
 
         <Route path="/1quiz" element={<OneAnsQuizPage />} />
         <Route path="/mquiz" element={<MultiAnsQuizPage />} />
