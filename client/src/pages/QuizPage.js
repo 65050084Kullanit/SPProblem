@@ -413,22 +413,21 @@ export default function QuizPage() {
         timeLimit={
           timerType === "quiz" ? quizRemainingTime : timeLimit
         }
-        onNext={(orderedAnswers) => {
+        onNext={(orderedAnswers,actualTimeSpent) => {
           // orderedAnswers = [{ optionId, order }, ...]
           submitAnswer({
             selectedIds: orderedAnswers,
-            timeSpent: timeLimit,
+            timeSpent: actualTimeSpent,
             questionType: "ordering", 
           });
         }}
-        onTimeUp={() => {
-          // หมดเวลา → ส่งคำตอบว่าง
+        onTimeUp={(orderedAnswers, actualTimeSpent) => {
           submitAnswer({
-            selectedIds: [],
-            timeSpent: timeLimit,
-            questionType: "ordering", 
+            selectedIds: orderedAnswers,
+            timeSpent: actualTimeSpent,
+            questionType: "ordering",
           });
-        }}
+      }}
       />
     );
   }

@@ -205,6 +205,7 @@ const Lobby = () => {
        // 🔥 เข้าห้อง activity ทันที
       socket.emit("join_activity", {
         activitySessionId: payload.activitySessionId,
+        studentId: playerData.studentId
       });
 
     

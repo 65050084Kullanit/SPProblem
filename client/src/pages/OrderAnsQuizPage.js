@@ -23,6 +23,8 @@ function Activity_quiz_ordering({
   const [items, setItems] = useState([]);
   const [timer, setTimer] = useState(null);
   const [showImage, setShowImage] = useState(false);
+  const [startTime, setStartTime] = useState(Date.now());
+
 
   /* =========================
      Init per question
@@ -32,6 +34,7 @@ function Activity_quiz_ordering({
 
     setItems(shuffleArray(question.choices)); // 🔀 สำคัญที่สุด
     setTimer(timeLimit ?? null);
+    setStartTime(Date.now());   // 🔥 reset start time
   }, [question?.Question_ID]);
 
   /* =========================
@@ -52,9 +55,13 @@ function Activity_quiz_ordering({
      ========================= */
   useEffect(() => {
     if (timer === 0) {
-      onTimeUp?.();
+      const actualTimeSpent = timeLimit;
+
+      onTimeUp?.([], actualTimeSpent);
     }
-  }, [timer, onTimeUp]);
+  }, [timer]);
+
+
 
   /* =========================
      Drag reorder
@@ -186,8 +193,14 @@ function Activity_quiz_ordering({
                 order: index + 1,
                 }));
 
+                const actualTimeSpent = Math.floor(
+                  (Date.now() - startTime) / 1000
+                );
+
                 console.log("📤 submit ordering:", payload);
-                onNext(payload);
+                console.log("⏱ actualTimeSpent =", actualTimeSpent);
+
+                onNext(payload, actualTimeSpent);  // 🔥 ส่งเวลาจริง
             }}
             className="w-72 py-3 mt-9 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
         >
