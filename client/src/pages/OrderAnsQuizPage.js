@@ -175,39 +175,47 @@ function Activity_quiz_ordering({
       </DragDropContext>
 
       {/* Footer */}
-      <div className="mt-8 flex items-center gap-6">
-        {timer !== null && (
-          <div
-            className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold ${
-              timer <= 5 ? "bg-red-400 text-white" : "bg-gray-300"
-            }`}
-          >
-            {timer}s
-          </div>
-        )}
+      <div className="w-11/12 mt-8 grid grid-cols-3 items-center">
 
-        <button
+        {/* ซ้าย */}
+        <div>
+          {timer !== null && (
+            <div
+              className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold ${
+                timer <= 5 ? "bg-red-400 text-white" : "bg-gray-300"
+              }`}
+            >
+              {timer}s
+            </div>
+          )}
+        </div>
+
+        {/* กลาง spacer */}
+        <div></div>
+
+        {/* ขวา */}
+        <div className="flex justify-end">
+          <button
             onClick={() => {
-                const payload = items.map((item, index) => ({
+              const payload = items.map((item, index) => ({
                 optionId: item.Option_ID,
                 order: index + 1,
-                }));
+              }));
 
-                const actualTimeSpent = Math.floor(
-                  (Date.now() - startTime) / 1000
-                );
+              const actualTimeSpent = Math.floor(
+                (Date.now() - startTime) / 1000
+              );
 
-                console.log("📤 submit ordering:", payload);
-                console.log("⏱ actualTimeSpent =", actualTimeSpent);
-
-                onNext(payload, actualTimeSpent);  // 🔥 ส่งเวลาจริง
+              onNext(payload, actualTimeSpent);
             }}
-            className="w-72 py-3 mt-9 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
-        >
+            className="w-72 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
+          >
             Next
-        </button>
+          </button>
+        </div>
 
       </div>
+
     </div>
   );
 }

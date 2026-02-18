@@ -138,8 +138,6 @@
 
 // export default OneAnsQuizPage;
 
-
-
 import { useEffect, useState } from "react";
 import Navbar from "../Navbar";
 import { Maximize2 } from "lucide-react";
@@ -155,7 +153,7 @@ function OneAnsQuizPage({
 }) {
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [timer, setTimer] = useState(() =>
-    Number.isFinite(timeLimit) ? timeLimit : 0
+    Number.isFinite(timeLimit) ? timeLimit : null
   );
 
 
@@ -232,6 +230,9 @@ function OneAnsQuizPage({
         {question.Question_Text}
       </div>
 
+      {/* Choose text */}
+      <p className="text-gray-700 mb-3">choose 1 choice</p>
+
       {question.Question_Image && (
         <div className="w-[300px] h-[300px] bg-gray-300 mt-4 relative rounded-lg">
           <img
@@ -253,30 +254,43 @@ function OneAnsQuizPage({
           <button
             key={c.Option_ID}
             onClick={() => setSelectedChoice(c.Option_ID)}
-            className={`w-full py-4 rounded-2xl ${
-              selectedChoice === c.Option_ID
+            className={`w-full py-4 rounded-2xl ${selectedChoice === c.Option_ID
                 ? "bg-gray-500 text-white"
                 : "bg-gray-300"
-            }`}
+              }`}
           >
             {c.Option_Text}
           </button>
         ))}
       </div>
 
-      <div className="w-11/12 flex justify-between mt-10">
-        <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl">
-          {timer}s
+      <div className="w-11/12 grid grid-cols-3 items-center mt-10">
+  
+        {/* ซ้าย */}
+        <div>
+          {Number.isFinite(timer) && (
+            <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl">
+              {timer}s
+            </div>
+          )}
         </div>
 
-        <button
-          disabled={locked || selectedChoice === null}
-          onClick={autoSubmit}
-          className="bg-gray-600 text-white px-10 py-3 rounded-2xl disabled:opacity-50"
-        >
-          Next
-        </button>
+        {/* กลาง (เว้นที่ไว้เสมอ) */}
+        <div></div>
+
+        {/* ขวา */}
+        <div className="flex justify-end">
+          <button
+            disabled={locked || selectedChoice === null}
+            onClick={autoSubmit}
+            className="w-72 bg-gray-600 text-white px-10 py-3 rounded-2xl disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
       </div>
+
 
       {showImage && (
         <div
