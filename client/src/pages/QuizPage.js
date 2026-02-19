@@ -301,6 +301,7 @@ export default function QuizPage() {
   const { state } = useLocation();
   const safeState = state ?? {};
   const { joinCode } = useParams();
+  const [rank, setRank] = useState(null);
 
 
   const {
@@ -437,6 +438,14 @@ export default function QuizPage() {
   }, [studentId]);
 
 
+  useEffect(() => {
+    socket.on("my_rank_update", ({ rank }) => {
+      setRank(rank);
+    });
+
+    return () => socket.off("my_rank_update");
+  }, []);
+
 
 
 /* ================= Quiz Ended ================= */
@@ -463,6 +472,44 @@ export default function QuizPage() {
   }, [quizEnded, navigate, activitySessionId, studentId]);
 
 
+  //refresh
+  useEffect(() => {
+    if (!question) return;
+
+    socket.emit("check_answer_status", {
+      activitySessionId,
+      questionId: question.Question_ID,
+      studentId,
+      questionType: question.Question_Type
+    });
+
+
+    const handler = ({
+      alreadyAnswered,
+      isCorrect,
+      scoreForThis,
+      totalScore,
+      timeSpent,
+      rank
+    }) => {
+
+      if (alreadyAnswered) {
+        setIsCorrect(isCorrect);
+        setPointForThis(scoreForThis);
+        setCurrentPoint(totalScore);
+        setLastTimeSpent(timeSpent);
+        setRank(rank);
+        setLocalPhase("solution");
+      }
+    };
+
+
+
+    socket.on("answer_status", handler);
+
+    return () => socket.off("answer_status", handler);
+
+  }, [questionIndex]);
 
 
   /* ================= ACTION ================= */
@@ -513,7 +560,7 @@ export default function QuizPage() {
         pointForThis={pointForThis}
         currentPoint={currentPoint}
         timeSpent={lastTimeSpent}
-        rank={null}
+        rank={rank}
         username="Aka"
         showNext={!isTeacherPaced}
         onNext={goNextQuestion}

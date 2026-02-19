@@ -81,6 +81,15 @@ function Activity_quiz_ordering({
     return <p className="text-center mt-20">Loading...</p>;
   }
 
+  const formatTime = (seconds) => {
+    if (!Number.isFinite(seconds)) return "";
+
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center py-6">
 
@@ -185,7 +194,7 @@ function Activity_quiz_ordering({
                 timer <= 5 ? "bg-red-400 text-white" : "bg-gray-300"
               }`}
             >
-              {timer}s
+              {formatTime(timer)}
             </div>
           )}
         </div>

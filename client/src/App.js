@@ -7,13 +7,14 @@ import SelectAvatar from "./pages/SelectAvatar";
 import Lobby from "./pages/Lobby";
 import QuizPage from "./pages/QuizPage";
 import EndQuizPage from "./pages/EndQuizPage";
+import GameAnalysis from "./pages/GameAnalysis";
 
 
 import OneAnsQuizPage from "./pages/OneAnsQuizPage3";
 import MultiAnsQuizPage from "./pages/MultiAnsQuizPage";
 import AnswerResultPage from "./pages/AnswerResultPage";
 import RankingPage from "./pages/RankingPage";
-import GameAnalysis from "./pages/GameAnalysis";
+// import GameAnalysis from "./pages/GameAnalysis";
 import Poll from "./pages/Poll";
 import OpenChat from "./pages/OpenChat";
 
@@ -38,6 +39,7 @@ function App() {
         <Route path="/class/:joinCode/lobby" element={<Lobby />} />
         <Route path="/class/:joinCode/lobby/quiz/:activitySessionId" element={<QuizPage />} />
         <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end" element={<EndQuizPage />} />
+        <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end/analysis" element={<GameAnalysis />} />
 
 
         <Route path="/1quiz" element={<OneAnsQuizPage />} />

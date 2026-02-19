@@ -203,6 +203,15 @@ function MultiAnsQuizPage({
     );
   };
 
+  const formatTime = (seconds) => {
+    if (!Number.isFinite(seconds)) return "";
+
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px]">
       <Navbar />
@@ -275,7 +284,7 @@ function MultiAnsQuizPage({
         <div>
           {!isQuizTimer && Number.isFinite(timer) && (
             <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl bg-gray-300">
-              {timer}s
+              {formatTime(timer)}
             </div>
           )}
         </div>

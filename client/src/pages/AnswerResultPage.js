@@ -149,6 +149,8 @@
 import { useEffect, useState } from "react";
 import Navbar from "../Navbar";
 import { Crown } from "lucide-react";
+import { socket } from "../socket";
+
 
 function AnswerResultPage({
   isTeacherPaced = false,
@@ -167,6 +169,7 @@ function AnswerResultPage({
 
 }) {
   const [displayPoint, setDisplayPoint] = useState(currentPoint);
+  const [myRank, setMyRank] = useState(rank);
 
   console.log("AnswerResultPage props:", {
     isQuizTimer,
@@ -197,6 +200,26 @@ function AnswerResultPage({
     return () => clearInterval(counter);
   }, [currentPoint]);
 
+  const formatTime = (seconds) => {
+    if (!Number.isFinite(seconds)) return "";
+
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    const handler = ({ rank }) => {
+      setMyRank(rank);
+    };
+
+    socket.on("my_rank_update", handler);
+
+    return () => socket.off("my_rank_update", handler);
+  }, []);
+
+
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px] pb-16">
@@ -213,7 +236,7 @@ function AnswerResultPage({
               : "bg-gray-800 text-white"}
           `}
         >
-          ⏱ {quizRemainingTime}s
+          ⏱ {formatTime(quizRemainingTime)}
         </div>
       )}
 
@@ -269,7 +292,7 @@ function AnswerResultPage({
           <div className="flex items-center gap-2 mt-1">
             <Crown className="w-6 h-6" />
             <p className="text-xl font-medium">
-              {rank ? `#${rank}` : "1st place"}
+              {myRank ? `#${myRank}` : "-"}
             </p>
           </div>
         </>

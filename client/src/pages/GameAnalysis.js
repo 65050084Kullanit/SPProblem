@@ -1,98 +1,97 @@
-import Navbar from "../Navbar";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { socket } from "../socket";
+import QuestionAnalysisDetail from "./QuestionAnalysisDetail";
 
-function GameAnalysis() {
+function GameAnalysis({ 
+  activitySessionId, 
+  beforePage, 
+  onBack, 
+  classId, 
+  joinCode 
+}) {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const questions = [
-    {
-      question: "ข้อใดคือสาเหตุสำคัญที่ทำให้เกิดภาวะโลกร้อนในปัจจุบัน?",
-      correctIndex: 0,
-      choices: [
-        { text: "การปล่อยก๊าซเรือนกระจกจากอุตสาหกรรม", percent: 55 },
-        { text: "การเพิ่มขึ้นของจำนวนป่าไม้", percent: 5 },
-        { text: "การใช้พลังงานทดแทนมากเกินไป", percent: 20 },
-        { text: "การหมุนของโลกผิดปกติ", percent: 20 },
-      ],
-      time: 14,
-    },
-    {
-      question: "เหตุผลใดที่ทำให้หลายประเทศเริ่มหันมาใช้พลังงานสะอาดมากขึ้น?",
-      correctIndex: 1,
-      choices: [
-        { text: "ต้นทุนการผลิตสูงขึ้น", percent: 12 },
-        { text: "ต้องการลดผลกระทบต่อสิ่งแวดล้อม", percent: 72 },
-        { text: "เพราะพลังงานฟอสซิลหมดไปแล้วทั้งหมด", percent: 16 },
-      ],
-      time: 11,
-    },
-    {
-      question: "การรีไซเคิลมีผลดีอย่างไรต่อเศรษฐกิจในระยะยาว?",
-      correctIndex: 0,
-      choices: [
-        { text: "ลดค่าใช้จ่ายด้านการจัดการขยะ", percent: 65 },
-        { text: "เพิ่มการใช้ทรัพยากรใหม่", percent: 10 },
-        { text: "ทำให้ราคาน้ำมันสูงขึ้น", percent: 5 },
-        { text: "ไม่มีผลต่อเศรษฐกิจ", percent: 20 },
-      ],
-      time: 13,
-    },
-  ];
+    // const { classId, joinCode } = useParams();
+  // const { activitySessionId } = location.state || {};
+  // const activitySessionId = propSessionId ||
+  //   location?.state?.activitySessionId;
+  const [questions, setQuestions] = useState([]);
+  const [analysisMap, setAnalysisMap] = useState({});
+  const beforePageState = beforePage || "Play_Quiz";
+
+  console.log("GameAnalysis activitySessionId =", activitySessionId, " beforePage =", beforePage);
+
+  /* โหลดคำถาม */
+  useEffect(() => {
+    if (!activitySessionId) return;
+
+    socket.emit("get_questions_by_activity", { activitySessionId });
+
+    const handler = (data) => setQuestions(data || []);
+    socket.on("questions_by_activity_data", handler);
+
+    return () => socket.off("questions_by_activity_data", handler);
+  }, [activitySessionId]);
+
+  /* โหลด analysis ต่อข้อ */
+  useEffect(() => {
+    if (!activitySessionId || questions.length === 0) return;
+
+    questions.forEach((q) => {
+      socket.emit("get_question_analysis", {
+        activitySessionId,
+        questionId: q.Question_ID,
+      });
+    });
+
+    const handler = (data) => {
+      if (!data?.length) return;
+      const qid = data[0].Question_ID;
+      setAnalysisMap((prev) => ({ ...prev, [qid]: data }));
+    };
+
+    socket.on("question_analysis_data", handler);
+    return () => socket.off("question_analysis_data", handler);
+  }, [activitySessionId, questions]);
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col pt-[80px] items-center relative">
+    <div className="flex flex-col min-h-screen bg-white">
 
-      <Navbar />
+      {/* CONTENT */}
+      <div className="flex-1 overflow-y-auto px-4 pt-6 space-y-6">
+        <h1 className="text-2xl font-bold">Game Analysis</h1>
 
-      <h1 className="text-3xl font-bold mb-4 mt-4">วิเคราะห์เกม</h1>
+        {questions.map((q, index) => (
+          <div key={q.Question_ID} className="border rounded-xl p-5 bg-white">
+            <h2 className="font-semibold">
+              ข้อ {index + 1}: {q.Question_Text}
+            </h2>
 
-      <div className="w-11/12 border border-black rounded-2xl p-5 max-h-[65vh] overflow-y-auto">
-
-        {questions.map((q, qIndex) => (
-          <div key={qIndex} className="mb-10">
-
-            <div className="bg-gray-300 p-4 rounded-xl text-center text-xl font-medium mb-4">
-              {q.question}
-            </div>
-
-            {q.choices.map((c, i) => {
-              const isCorrect = i === q.correctIndex;
-
-              return (
-                <div
-                  key={i}
-                  className="relative bg-gray-200 rounded-xl p-2 mb-3 flex items-center justify-between overflow-hidden"
-                >
-
-                  {/* === แถบเปอร์เซ็นต์ด้านหลัง === */}
-                  <div
-                    className={`absolute left-0 top-0 h-full rounded-xl transition-all duration-500
-                      ${isCorrect ? "bg-green-600" : "bg-gray-500"}
-                    `}
-                    style={{ width: `${c.percent}%` }}
-                  />
-
-                  {/* เนื้อหาตัวเลือก */}
-                  <div className="relative flex justify-between items-center w-full px-2">
-                    <span className="font-medium text-black">{c.text}</span>
-                    <span className="font-medium text-lg">{c.percent}%</span>
-                  </div>
-                </div>
-              );
-            })}
-
-            <p className="text-center mt-3 text-gray-600">
-              time : {q.time} sec
-            </p>
+            {analysisMap[q.Question_ID] && (
+              <QuestionAnalysisDetail
+                analysis={analysisMap[q.Question_ID]}
+              />
+            )}
           </div>
         ))}
+        {beforePageState === "Play_Quiz" && (
+          <div className="sticky bottom-0 bg-white border-t p-4 z-50">
 
-      </div>
+            <button
+              // onClick={() => navigate("/quiz_report", {state: { activitySessionId, beforePage, classId, joinCode }})}
+              onClick={onBack}
+              className="w-full py-3 bg-gray-600 text-white rounded-xl"
+            >
+              Back
+            </button>
 
-      <div className="w-full flex justify-center py-6 bg-white">
-        <button className="bg-gray-600 text-white w-10/12 py-4 rounded-2xl text-lg hover:bg-gray-400">
-          Back
-        </button>
+          </div>)}
       </div>
     </div>
+
   );
 }
 

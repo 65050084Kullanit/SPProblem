@@ -217,6 +217,16 @@ function OneAnsQuizPage({
     );
   };
 
+  const formatTime = (seconds) => {
+    if (!Number.isFinite(seconds)) return "";
+
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px]">
@@ -253,7 +263,18 @@ function OneAnsQuizPage({
         {question.choices.map((c) => (
           <button
             key={c.Option_ID}
-            onClick={() => setSelectedChoice(c.Option_ID)}
+            // onClick={() => setSelectedChoice(c.Option_ID)}
+            onClick={() => {
+              if (locked) return;
+
+              setSelectedChoice(c.Option_ID);
+
+              const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+              setLocked(true);
+
+              onSubmit([c.Option_ID], timeSpent);
+            }}
+
             className={`w-full py-4 rounded-2xl ${selectedChoice === c.Option_ID
                 ? "bg-gray-500 text-white"
                 : "bg-gray-300"
@@ -270,7 +291,7 @@ function OneAnsQuizPage({
         <div>
           {Number.isFinite(timer) && (
             <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl">
-              {timer}s
+              {formatTime(timer)}
             </div>
           )}
         </div>
@@ -279,7 +300,7 @@ function OneAnsQuizPage({
         <div></div>
 
         {/* ขวา */}
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <button
             disabled={locked || selectedChoice === null}
             onClick={autoSubmit}
@@ -287,7 +308,7 @@ function OneAnsQuizPage({
           >
             Next
           </button>
-        </div>
+        </div> */}
 
       </div>
 
