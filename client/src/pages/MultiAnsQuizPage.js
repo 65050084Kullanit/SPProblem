@@ -1,0 +1,421 @@
+
+// import { useState, useEffect } from "react";
+// import Navbar from "../Navbar";
+// import { socket } from "../socket";
+// import { Maximize2 } from "lucide-react";
+
+
+// function MultiAnsQuizPage({
+//   question,
+//   timeLimit,
+//   isQuizTimer,
+//   currentQuestion,
+//   totalQuestions,
+//   onSubmit,
+// }) {
+//   const [selectedChoices, setSelectedChoices] = useState([]);
+//   const [timer, setTimer] = useState(() =>
+//     Number.isFinite(timeLimit) ? timeLimit : 0
+//   );
+
+//   const [locked, setLocked] = useState(false);
+//   const [startTime, setStartTime] = useState(Date.now());
+//   const [showImage, setShowImage] = useState(false);
+
+
+//   const autoSubmit = () => {
+//     if (locked) return;
+//     setLocked(true);
+
+//     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+//     onSubmit(selectedChoices, timeSpent);
+//   };
+
+//   /* ⏱ reset เมื่อเปลี่ยนข้อ (เฉพาะที่ไม่ใช่ quiztimer)*/
+//   useEffect(() => {
+//     if (isQuizTimer) return;   // ❗ ห้าม reset
+//     //  if (typeof timeLimit !== "number" || Number.isNaN(timeLimit)) return;
+//     setTimer(timeLimit);
+//     setLocked(false);
+//     setSelectedChoices([]);
+//     setStartTime(Date.now());
+//   }, [question.Question_ID]);
+
+//   //countdown (เฉพาะที่ไม่ใช่ quiztimer)
+//   useEffect(() => {
+//     if (isQuizTimer) return;
+//     if (locked) return;
+//     if (!Number.isFinite(timer)) return;
+
+//     if (timer <= 0) {
+//       autoSubmit();
+//       return;
+//     }
+
+//     const i = setInterval(() => {
+//       setTimer(t => (Number.isFinite(t) ? t - 1 : 0));
+//     }, 1000);
+
+//     return () => clearInterval(i);
+//   }, [timer, locked, isQuizTimer]);
+
+//   //sync Quiz Timer (แสดงอย่างเดียว)
+//   useEffect(() => {
+//     if (!isQuizTimer) return;
+//     if (!Number.isFinite(timeLimit)) return;
+
+//     setTimer(timeLimit);
+//   }, [timeLimit, isQuizTimer]);
+
+//   /* 👩‍🏫 ครูกดตัดข้อ */
+//   useEffect(() => {
+//     socket.on("force_submit", autoSubmit);
+//     return () => socket.off("force_submit", autoSubmit);
+//   }, []);
+
+//   const toggle = (id) => {
+//     if (locked) return;
+
+//     setSelectedChoices((prev) =>
+//       prev.includes(id)
+//         ? prev.filter((x) => x !== id)
+//         : [...prev, id]
+//     );
+//   };
+
+//   const formatTime = (seconds) => {
+//     if (!Number.isFinite(seconds)) return "";
+
+//     const m = Math.floor(seconds / 60);
+//     const s = seconds % 60;
+
+//     return `${m}:${s.toString().padStart(2, "0")}`;
+//   };
+
+//   return (
+//     <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px]">
+//       <Navbar />
+
+//       <div className="bg-gray-300 px-6 py-2 rounded-xl self-end">
+//         Now Question {currentQuestion}/{totalQuestions}
+//       </div>
+
+//       <div className="w-11/12 bg-gray-300 py-10 text-center text-xl rounded-lg">
+//         {question.Question_Text}
+//       </div>
+
+//       {/* Choose text */}
+//       <p className="text-gray-700 mb-3">select all correct choices</p>
+
+
+
+//     {/* 🖼 Image (ถ้ามี) */}
+//       {question.Question_Image && (
+//         <div className="w-[300px] h-[300px] bg-gray-300 rounded-lg mb-4 relative">
+//           <img
+//             src={question.Question_Image}
+//             alt="question"
+//             className="w-full h-full object-contain"
+//           />
+
+//           <button
+//             onClick={() => setShowImage(true)}
+//             className="bg-black text-white px-3 py-1 rounded-lg absolute bottom-2 right-2 opacity-80"
+//           >
+//             <Maximize2 className="w-5 h-5" />
+//           </button>
+//         </div>
+//       )}
+
+//       {/* Fullscreen Image */}
+//       {showImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
+//           onClick={() => setShowImage(false)}
+//         >
+//           <img
+//             src={question.Question_Image}
+//             className="max-w-[90%] max-h-[90%] object-contain rounded-lg"
+//             alt="full"
+//           />
+//         </div>
+//       )}
+
+//       <div className="w-11/12 space-y-3 mt-4">
+//         {question.choices.map((c) => (
+//           <button
+//             key={c.Option_ID}
+//             onClick={() => toggle(c.Option_ID)}
+//             disabled={locked}
+//             className={`w-full py-4 rounded-2xl transition ${
+//               selectedChoices.includes(c.Option_ID)
+//                 ? "bg-green-300"
+//                 : "bg-gray-300"
+//             } ${locked ? "opacity-50" : ""}`}
+//           >
+//             {c.Option_Text}
+//           </button>
+//         ))}
+//       </div>
+
+//       <div className="w-11/12 grid grid-cols-3 items-center mt-10">
+
+//         {/* ซ้าย */}
+//         <div>
+//           {!isQuizTimer && Number.isFinite(timer) && (
+//             <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl bg-gray-300">
+//               {formatTime(timer)}
+//             </div>
+//           )}
+//         </div>
+
+//         {/* กลาง spacer */}
+//         <div></div>
+
+//         {/* ขวา */}
+//         <div className="flex justify-end">
+//           <button
+//             disabled={locked || selectedChoices.length === 0}
+//             onClick={autoSubmit}
+//             className="w-72 bg-gray-600 text-white px-10 py-3 rounded-2xl disabled:opacity-50"
+//           >
+//             Next
+//           </button>
+//         </div>
+
+//       </div>
+
+//     </div>
+//   );
+// }
+
+// export default MultiAnsQuizPage;
+
+
+
+
+import { useState, useEffect, useRef } from "react";
+import Navbar from "../Navbar";
+import { socket } from "../socket";
+import { Maximize2 } from "lucide-react";
+
+
+function MultiAnsQuizPage({
+  question,
+  timeLimit,
+  isQuizTimer,
+  currentQuestion,
+  totalQuestions,
+  onSubmit,
+}) {
+  const [selectedChoices, setSelectedChoices] = useState([]);
+  const [timer, setTimer] = useState(() =>
+    Number.isFinite(timeLimit) ? timeLimit : 0
+  );
+
+  const [locked, setLocked] = useState(false);
+  const startTimeRef = useRef(null);
+  const [showImage, setShowImage] = useState(false);
+
+
+ const autoSubmit = () => {
+    if (locked) return;
+    setLocked(true);
+
+    localStorage.removeItem(`start_${question.Question_ID}`);
+
+    const timeSpent = startTimeRef.current
+      ? Math.floor((Date.now() - startTimeRef.current) / 1000)
+      : 0;
+
+    onSubmit(selectedChoices, timeSpent);
+  };
+
+  useEffect(() => {
+    if (isQuizTimer) return;
+    if (!Number.isFinite(timeLimit)) return;
+
+    setLocked(false);
+    setSelectedChoices([]);
+
+    const key = `start_${question.Question_ID}`;
+    const savedStart = localStorage.getItem(key);
+
+    if (savedStart) {
+      const elapsed =
+        Math.floor((Date.now() - Number(savedStart)) / 1000);
+
+      if (elapsed >= timeLimit) {
+        const now = Date.now();
+        startTimeRef.current = now;
+        localStorage.setItem(key, now);
+      } else {
+        startTimeRef.current = Number(savedStart);
+      }
+    } else {
+      const now = Date.now();
+      startTimeRef.current = now;
+      localStorage.setItem(key, now);
+    }
+
+  }, [question.Question_ID, timeLimit, isQuizTimer]);
+
+  //countdown (เฉพาะที่ไม่ใช่ quiztimer)
+  useEffect(() => {
+    if (isQuizTimer) return;
+    if (!Number.isFinite(timeLimit)) return;
+    if (!startTimeRef.current) return;
+    if (locked) return;
+
+    const updateTimer = () => {
+      const elapsed =
+        Math.floor((Date.now() - startTimeRef.current) / 1000);
+
+      const remaining = timeLimit - elapsed;
+
+      if (remaining <= 0) {
+        setTimer(0);
+        autoSubmit();
+      } else {
+        setTimer(remaining);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+
+  }, [question.Question_ID, locked, timeLimit, isQuizTimer]);
+
+  //sync Quiz Timer (แสดงอย่างเดียว)
+  useEffect(() => {
+    if (!isQuizTimer) return;
+    if (!Number.isFinite(timeLimit)) return;
+
+    setTimer(timeLimit);
+  }, [timeLimit, isQuizTimer]);
+
+  /* 👩‍🏫 ครูกดตัดข้อ */
+  useEffect(() => {
+    socket.on("force_submit", autoSubmit);
+    return () => socket.off("force_submit", autoSubmit);
+  }, []);
+
+  const toggle = (id) => {
+    if (locked) return;
+
+    setSelectedChoices((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : [...prev, id]
+    );
+  };
+
+  const formatTime = (seconds) => {
+    if (!Number.isFinite(seconds)) return "";
+
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px]">
+      <Navbar />
+
+      <div className="bg-gray-300 px-6 py-2 rounded-xl self-end">
+        Now Question {currentQuestion}/{totalQuestions}
+      </div>
+
+      <div className="w-11/12 bg-gray-300 py-10 text-center text-xl rounded-lg">
+        {question.Question_Text}
+      </div>
+
+      {/* Choose text */}
+      <p className="text-gray-700 mb-3">select all correct choices</p>
+
+
+
+    {/* 🖼 Image (ถ้ามี) */}
+      {question.Question_Image && (
+        <div className="w-[300px] h-[300px] bg-gray-300 rounded-lg mb-4 relative">
+          <img
+            src={question.Question_Image}
+            alt="question"
+            className="w-full h-full object-contain"
+          />
+
+          <button
+            onClick={() => setShowImage(true)}
+            className="bg-black text-white px-3 py-1 rounded-lg absolute bottom-2 right-2 opacity-80"
+          >
+            <Maximize2 className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
+      {/* Fullscreen Image */}
+      {showImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
+          onClick={() => setShowImage(false)}
+        >
+          <img
+            src={question.Question_Image}
+            className="max-w-[90%] max-h-[90%] object-contain rounded-lg"
+            alt="full"
+          />
+        </div>
+      )}
+
+      <div className="w-11/12 space-y-3 mt-4">
+        {question.choices.map((c) => (
+          <button
+            key={c.Option_ID}
+            onClick={() => toggle(c.Option_ID)}
+            disabled={locked}
+            className={`w-full py-4 rounded-2xl transition ${
+              selectedChoices.includes(c.Option_ID)
+                ? "bg-green-300"
+                : "bg-gray-300"
+            } ${locked ? "opacity-50" : ""}`}
+          >
+            {c.Option_Text}
+          </button>
+        ))}
+      </div>
+
+      <div className="w-11/12 grid grid-cols-3 items-center mt-10">
+
+        {/* ซ้าย */}
+        <div>
+          {!isQuizTimer && Number.isFinite(timer) && (
+            <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl bg-gray-300">
+              {formatTime(timer)}
+            </div>
+          )}
+        </div>
+
+        {/* กลาง spacer */}
+        <div></div>
+
+        {/* ขวา */}
+        <div className="flex justify-end">
+          <button
+            disabled={locked || selectedChoices.length === 0}
+            onClick={autoSubmit}
+            className="w-72 bg-gray-600 text-white px-10 py-3 rounded-2xl disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+export default MultiAnsQuizPage;

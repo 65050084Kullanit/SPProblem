@@ -1,0 +1,262 @@
+import { useState, useEffect , useRef} from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { Maximize2 } from "lucide-react";
+
+/* 🔀 shuffle helper */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function Activity_quiz_ordering({
+  question,
+  current,
+  total,
+  timeLimit,
+  onNext,
+  onTimeUp,
+}) {
+  const [items, setItems] = useState([]);
+  const [timer, setTimer] = useState(null);
+  const [showImage, setShowImage] = useState(false);
+  const startTimeRef = useRef(null);
+
+
+  /* =========================
+     Init per question
+     ========================= */
+  useEffect(() => {
+    if (!question) return;
+
+    setItems(shuffleArray(question.choices)); // 🔀 สำคัญที่สุด
+    setTimer(timeLimit ?? null);
+    const key = `start_${question.Question_ID}`;
+    const savedStart = localStorage.getItem(key);
+
+    if (savedStart) {
+      startTimeRef.current = Number(savedStart);
+    } else {
+      const now = Date.now();
+      startTimeRef.current = now;
+      localStorage.setItem(key, now);
+    }
+  }, [question?.Question_ID]);
+
+  /* =========================
+     Countdown
+     ========================= */
+  useEffect(() => {
+    if (!Number.isFinite(timeLimit)) return;
+    if (!startTimeRef.current) return;
+
+    const updateTimer = () => {
+      const elapsed =
+        Math.floor((Date.now() - startTimeRef.current) / 1000);
+
+      const remaining = timeLimit - elapsed;
+
+      if (remaining <= 0) {
+        setTimer(0);
+
+        localStorage.removeItem(`start_${question.Question_ID}`);
+
+        const actualTimeSpent = timeLimit;
+        onTimeUp?.([], actualTimeSpent);
+
+      } else {
+        setTimer(remaining);
+      }
+    };
+
+    updateTimer(); // ยิงทันทีตอน mount
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+
+  }, [question?.Question_ID, timeLimit]);
+  /* =========================
+     Time up
+     ========================= */
+  useEffect(() => {
+    if (timer === 0) {
+      const actualTimeSpent = timeLimit;
+
+      onTimeUp?.([], actualTimeSpent);
+    }
+  }, [timer]);
+
+
+
+  /* =========================
+     Drag reorder
+     ========================= */
+  const onDragEnd = ({ source, destination }) => {
+    if (!destination) return;
+
+    setItems((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(source.index, 1);
+      next.splice(destination.index, 0, moved);
+      return next;
+    });
+  };
+
+  if (!question || items.length === 0) {
+    return <p className="text-center mt-20">Loading...</p>;
+  }
+
+  const formatTime = (seconds) => {
+    if (!Number.isFinite(seconds)) return "";
+
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="w-full min-h-screen bg-white flex flex-col items-center py-6">
+
+      {/* Progress */}
+      <p className="mb-4 font-medium">
+        Now Question {current}/{total}
+      </p>
+
+      {/* Question */}
+      <div className="w-11/12 bg-gray-300 p-6 rounded-xl text-center text-xl font-semibold mb-4">
+        {question.Question_Text}
+      </div>
+
+      {/* Image */}
+      {question.Question_Image && (
+        <div className="w-[300px] h-[300px] bg-gray-300 rounded-lg mb-4 relative">
+          <img
+            src={question.Question_Image}
+            alt="question"
+            className="w-full h-full object-contain"
+          />
+          <button
+            onClick={() => setShowImage(true)}
+            className="absolute bottom-2 right-2 bg-black text-white px-3 py-1 rounded-lg"
+          >
+            <Maximize2 className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
+      {/* Fullscreen Image */}
+      {showImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
+          onClick={() => setShowImage(false)}
+        >
+          <img
+            src={question.Question_Image}
+            className="max-w-[90%] max-h-[90%] object-contain rounded-lg"
+            alt="full"
+          />
+        </div>
+      )}
+
+      <p className="text-gray-700 mb-3">drag to sort answers</p>
+
+      {/* Ordering list */}
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="ordering">
+          {(provided) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className="w-11/12 space-y-3"
+            >
+              {items.map((item, index) => (
+                <Draggable
+                  key={item.Option_ID}
+                  draggableId={String(item.Option_ID)}
+                  index={index}
+                >
+                {/* // <Draggable */}
+                {/* //   key={`choice-${item.id}`}
+                //   draggableId={`choice-${item.id}`}
+                //   index={index}
+                // > */}
+
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className="w-full py-4 px-4 bg-gray-300 rounded-xl flex items-center gap-4 cursor-move hover:bg-gray-400"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold">
+                        {index + 1}
+                      </div>
+
+                      <div className="flex-1 text-left">
+                        {item.Option_Text}
+                      </div>
+
+                      <div className="text-xl opacity-60">☰</div>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+      {/* Footer */}
+      <div className="w-11/12 mt-8 grid grid-cols-3 items-center">
+
+        {/* ซ้าย */}
+        <div>
+          {timer !== null && (
+            <div
+              className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold ${
+                timer <= 5 ? "bg-red-400 text-white" : "bg-gray-300"
+              }`}
+            >
+              {formatTime(timer)}
+            </div>
+          )}
+        </div>
+
+        {/* กลาง spacer */}
+        <div></div>
+
+        {/* ขวา */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => {
+              const payload = items.map((item, index) => ({
+                optionId: item.Option_ID,
+                order: index + 1,
+              }));
+
+              const actualTimeSpent = startTimeRef.current
+                ? Math.floor((Date.now() - startTimeRef.current) / 1000)
+                : 0;
+
+              localStorage.removeItem(`start_${question.Question_ID}`);
+
+              onNext(payload, actualTimeSpent);
+            }}
+            className="w-72 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
+          >
+            Next
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+export default Activity_quiz_ordering;
