@@ -149,36 +149,85 @@ const Lobby = () => {
   const savedPlayer = localStorage.getItem("student_meta");
   const playerData = savedPlayer ? JSON.parse(savedPlayer) : null;
   const currentUser = playerData;
+  
 
+
+  // useEffect(() => {
+  //   if (!playerData || !joinCode) return;
+
+  //   console.log("🎧 Lobby listening");
+
+  //   socket.on("room-players", (playersInRoom) => {
+  //     console.log("📥 room-players", playersInRoom);
+  //     setPlayers(playersInRoom);
+  //   });
+
+  //   socket.on("player-joined", (newPlayer) => {
+  //     setPlayers((prev) => {
+  //       const exists = prev.some((p) => String(p.studentId) === String(newPlayer.studentId));
+  //       return exists ? prev : [...prev, newPlayer];
+  //     });
+  //   });
+
+  //   // 🔥 emit หลังจาก on แล้วเท่านั้น
+  //   socket.emit("join-room", {
+  //     joinCode,
+  //     player: playerData,
+  //   });
+
+  //   return () => {
+  //     socket.off("room-players");
+  //     socket.off("player-joined");
+  //   };
+  // }, [playerData, joinCode]);
 
   useEffect(() => {
     if (!playerData || !joinCode) return;
 
     console.log("🎧 Lobby listening");
 
-    socket.on("room-players", (playersInRoom) => {
+    const handleRoomPlayers = (playersInRoom) => {
       console.log("📥 room-players", playersInRoom);
       setPlayers(playersInRoom);
-    });
+    };
 
-    socket.on("player-joined", (newPlayer) => {
+    const handlePlayerJoined = (newPlayer) => {
       setPlayers((prev) => {
-        const exists = prev.some((p) => String(p.studentId) === String(newPlayer.studentId));
+        const exists = prev.some((p) =>
+          String(p.studentId) === String(newPlayer.studentId)
+        );
         return exists ? prev : [...prev, newPlayer];
       });
-    });
+    };
 
-    // 🔥 emit หลังจาก on แล้วเท่านั้น
+    socket.on("room-players", handleRoomPlayers);
+    socket.on("player-joined", handlePlayerJoined);
+
     socket.emit("join-room", {
       joinCode,
       player: playerData,
     });
 
     return () => {
-      socket.off("room-players");
-      socket.off("player-joined");
+      socket.off("room-players", handleRoomPlayers);
+      socket.off("player-joined", handlePlayerJoined);
     };
-  }, [playerData, joinCode]);
+  }, [joinCode]);   // ❗ เอา playerData ออก  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // useEffect(() => {
   //   socket.on("player-updated", ({ studentId, stageName }) => {
@@ -235,8 +284,22 @@ const Lobby = () => {
   }, [joinCode]);
 
 
+  useEffect(() => {
+    const handler = () => {
+      console.log("🚪 Room closed by teacher");
 
+      localStorage.clear();
 
+      if (!localStorage.getItem("student_meta")) {
+      navigate("/", { replace: true });
+    }
+    };
+
+    socket.on("room_closed", handler);
+
+    return () => socket.off("room_closed", handler);
+  }, [navigate]);
+    
 
 
   return (
@@ -251,30 +314,37 @@ const Lobby = () => {
 
           return (
             <div
-              key={player.studentId}
-              className="flex flex-col items-center p-4 rounded-lg animate-fadePop hover:scale-105 transition-transform duration-300"
+              key={player.socketId}
+              className="flex flex-col items-center p-4 rounded-lg animate-fadePop hover:scale-105 transition-transform duration-300 "
             >
               {/* Avatar */}
               <div
-                className={`relative rounded-full flex items-center justify-center bg-gray-200 border-4 transition-all duration-300
+                className={`relative rounded-full overflow-hidden transition-all duration-300 animate-floating
                   ${isCurrent 
-                    ? "w-32 h-32 border-blue-500 text-5xl scale-105 shadow-lg shadow-blue-300/50 animate-floating" 
-                    : "w-24 h-24 border-gray-300 text-4xl animate-floating"
+                    ? "w-32 h-32 border-4 border-blue-500 scale-105 shadow-lg shadow-blue-300/50"
+                    : "w-24 h-24"
                   }`}
               >
-
-                {/* Face */}
-                <span className="absolute">{player.avatar?.face}</span>
-
-                {/* Hat */}
-                {player.avatar.hat && (
-                  <span className="absolute -top-2">{player.avatar.hat}</span>
-                )}
-
-                {/* Clothes */}
-                {player.avatar.clothes && (
-                  <span className="absolute bottom-0">{player.avatar.clothes}</span>
-                )}
+                <img
+                  src={player.avatar?.bodyPath}
+                  className="absolute inset-0 w-full h-full object-contain"
+                  alt=""
+                />
+                <img
+                  src={player.avatar?.costumePath}
+                  className="absolute inset-0 w-full h-full object-contain"
+                  alt=""
+                />
+                <img
+                  src={player.avatar?.hairPath}
+                  className="absolute inset-0 w-full h-full object-contain"
+                  alt=""
+                />
+                <img
+                  src={player.avatar?.facePath}
+                  className="absolute inset-0 w-full h-full object-contain"
+                  alt=""
+                />
               </div>
 
               {/* Stage name */}

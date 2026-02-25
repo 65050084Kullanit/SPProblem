@@ -102,7 +102,8 @@ import Navbar from "../Navbar";
 import { Crown } from "lucide-react";
 import { socket } from "../socket";
 
-function RankingPage({ username = "You" }) {
+
+function RankingPage() {
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -111,6 +112,26 @@ function RankingPage({ username = "You" }) {
   const { activitySessionId, studentId } = location.state || {};
 
   const [myRank, setMyRank] = useState(null);
+  const savedPlayer = localStorage.getItem("student_meta");
+  const playerData = savedPlayer ? JSON.parse(savedPlayer) : null;
+
+  const [avatar, setAvatar] = useState(null);
+  const [stageName, setStageName] = useState(null);
+
+  useEffect(() => {
+    if (!studentId) return;
+
+    socket.emit("request_my_profile", { studentId });
+
+    const handler = (data) => {
+      setStageName(data.stageName);
+      setAvatar(data.avatar);
+    };
+
+    socket.on("my_profile_data", handler);
+
+    return () => socket.off("my_profile_data", handler);
+  }, [studentId]);
 
   /* ================= GET RANK ================= */
 
@@ -164,16 +185,29 @@ function RankingPage({ username = "You" }) {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px] pb-16">
+    <div className="w-full min-h-screen bg-grey-100 flex flex-col items-center pt-[80px] pb-16">
       <Navbar />
 
       <h1 className="text-4xl font-bold mt-8">Ranking</h1>
 
-      <div className="w-[220px] h-[220px] bg-gray-300 rounded-full mt-10 flex items-center justify-center relative">
-        <Crown className="w-14 h-14 absolute -top-6 left-6 text-black animate-bounce" />
+      <div className="relative mt-16">
+
+        {myRank >= 1 && myRank <= 5 && (
+          <Crown
+            className="w-16 h-16 absolute -top-10 left-1/3 -translate-x-1/2 text-yellow-500  animate-bounce z-10"
+          />
+        )}
+
+        <div className="relative w-[220px] h-[220px] rounded-full overflow-hidden bg-white ">
+          <img src={avatar?.bodyPath} className="absolute inset-0 w-full h-full object-contain" />
+          <img src={avatar?.costumePath} className="absolute inset-0 w-full h-full object-contain" />
+          <img src={avatar?.hairPath} className="absolute inset-0 w-full h-full object-contain" />
+          <img src={avatar?.facePath} className="absolute inset-0 w-full h-full object-contain" />
+        </div>
+
       </div>
 
-      <p className="text-xl mt-4">{username}</p>
+      <p className="text-2xl font-bold mt-4">{stageName}</p>
 
       <h2 className="text-3xl font-bold mt-6">Your Rank</h2>
       <div className="flex items-center gap-2 mt-1">
