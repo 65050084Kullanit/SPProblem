@@ -1,6 +1,7 @@
 import { useState, useEffect , useRef} from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { Maximize2 } from "lucide-react";
+import { Maximize2,Clock } from "lucide-react";
+import Navbar from "../Navbar";
 
 /* 🔀 shuffle helper */
 function shuffleArray(arr) {
@@ -119,21 +120,23 @@ function Activity_quiz_ordering({
   };
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center py-6">
+    <div className="w-full min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center py-6">
+
+      <Navbar />
 
       {/* Progress */}
-      <p className="mb-4 font-medium">
+      <p className="mt-16 mb-4 text-slate-400 font-medium">
         Now Question {current}/{total}
       </p>
 
       {/* Question */}
-      <div className="w-11/12 bg-gray-300 p-6 rounded-xl text-center text-xl font-semibold mb-4">
+      <div className="w-11/12 max-w-3xl bg-slate-800 border border-slate-700 p-6 rounded-2xl text-center text-xl font-semibold mb-4">
         {question.Question_Text}
       </div>
 
       {/* Image */}
       {question.Question_Image && (
-        <div className="w-[300px] h-[300px] bg-gray-300 rounded-lg mb-4 relative">
+        <div className="w-[260px] h-[260px] bg-slate-800 border border-slate-700 rounded-xl mb-4 relative">
           <img
             src={question.Question_Image}
             alt="question"
@@ -141,7 +144,7 @@ function Activity_quiz_ordering({
           />
           <button
             onClick={() => setShowImage(true)}
-            className="absolute bottom-2 right-2 bg-black text-white px-3 py-1 rounded-lg"
+            className="absolute bottom-2 right-2 bg-slate-900 text-slate-100 px-3 py-1 rounded-lg"
           >
             <Maximize2 className="w-5 h-5" />
           </button>
@@ -151,7 +154,7 @@ function Activity_quiz_ordering({
       {/* Fullscreen Image */}
       {showImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
           onClick={() => setShowImage(false)}
         >
           <img
@@ -162,7 +165,10 @@ function Activity_quiz_ordering({
         </div>
       )}
 
-      <p className="text-gray-700 mb-3">drag to sort answers</p>
+      {/* Instruction */}
+      <p className="text-cyan-300 mb-3 font-medium">
+        Drag to sort answers
+      </p>
 
       {/* Ordering list */}
       <DragDropContext onDragEnd={onDragEnd}>
@@ -171,7 +177,7 @@ function Activity_quiz_ordering({
             <div
               ref={provided.innerRef}
               {...provided.droppableProps}
-              className="w-11/12 space-y-3"
+              className="w-11/12 max-w-3xl space-y-3"
             >
               {items.map((item, index) => (
                 <Draggable
@@ -179,28 +185,27 @@ function Activity_quiz_ordering({
                   draggableId={String(item.Option_ID)}
                   index={index}
                 >
-                {/* // <Draggable */}
-                {/* //   key={`choice-${item.id}`}
-                //   draggableId={`choice-${item.id}`}
-                //   index={index}
-                // > */}
-
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="w-full py-4 px-4 bg-gray-300 rounded-xl flex items-center gap-4 cursor-move hover:bg-gray-400"
+                      className="w-full py-4 px-4 bg-slate-800 border border-slate-700 rounded-xl flex items-center gap-4 cursor-move hover:bg-slate-700 transition"
                     >
-                      <div className="w-8 h-8 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold">
+
+                      {/* Order number */}
+                      <div className="w-8 h-8 rounded-full bg-cyan-500 text-slate-900 flex items-center justify-center font-bold">
                         {index + 1}
                       </div>
 
+                      {/* Text */}
                       <div className="flex-1 text-left">
                         {item.Option_Text}
                       </div>
 
+                      {/* Drag icon */}
                       <div className="text-xl opacity-60">☰</div>
+
                     </div>
                   )}
                 </Draggable>
@@ -212,46 +217,48 @@ function Activity_quiz_ordering({
       </DragDropContext>
 
       {/* Footer */}
-      <div className="w-11/12 mt-8 grid grid-cols-3 items-center">
+      <div className="w-11/12 mt-8 flex items-center justify-between">
 
-        {/* ซ้าย */}
+        {/* Timer */}
         <div>
           {timer !== null && (
             <div
-              className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold ${
-                timer <= 5 ? "bg-red-400 text-white" : "bg-gray-300"
+              className={`px-4 py-2 rounded-full flex items-center justify-center gap-1 text-lg font-bold
+              ${
+                timer <= 5
+                  ? "bg-red-500 text-white"
+                  : "bg-cyan-700 text-slate-100"
               }`}
             >
-              {formatTime(timer)}
+              <Clock size={18} />
+              <span>{formatTime(timer)}s</span>
             </div>
           )}
         </div>
 
-        {/* กลาง spacer */}
-        <div></div>
+        {/* Next */}
+        <button
+          onClick={() => {
+            const payload = items.map((item, index) => ({
+              optionId: item.Option_ID,
+              order: index + 1,
+            }));
 
-        {/* ขวา */}
-        <div className="flex justify-end">
-          <button
-            onClick={() => {
-              const payload = items.map((item, index) => ({
-                optionId: item.Option_ID,
-                order: index + 1,
-              }));
+            const actualTimeSpent = startTimeRef.current
+              ? Math.floor((Date.now() - startTimeRef.current) / 1000)
+              : 0;
 
-              const actualTimeSpent = startTimeRef.current
-                ? Math.floor((Date.now() - startTimeRef.current) / 1000)
-                : 0;
+            localStorage.removeItem(`start_${question.Question_ID}`);
 
-              localStorage.removeItem(`start_${question.Question_ID}`);
-
-              onNext(payload, actualTimeSpent);
-            }}
-            className="w-72 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
-          >
-            Next
-          </button>
-        </div>
+            onNext(payload, actualTimeSpent);
+          }}
+          className="px-6 py-3 rounded-lg
+          bg-cyan-400 text-slate-900 font-semibold
+          hover:bg-cyan-300 hover:scale-[1.02]
+          shadow-lg shadow-cyan-400/30 transition"
+        >
+          Next
+        </button>
 
       </div>
 

@@ -9,34 +9,6 @@ function JoinRoom() {
   const [error, setError] = useState("");  // ⭐ เพิ่ม state สำหรับ error
   const navigate = useNavigate();
 
-  // const handleJoin = () => {
-  //   if (code.trim() === "") {
-  //     setError("Please enter the room code");
-  //     return;
-  //   }
-
-  //   // Emit join_class event to server
-   
-  //   socket.emit("join_class", { joinCode: code });
-    
-
-  //   // Listen result from server
-  //   socket.once("join_result", (data) => {
-  //     if (data.success) {
-  //       console.log("Joined successfully:", data);
-
-  //       // Clear error ก่อน navigate
-  //       setError("");
-
-  //       // Navigate to StudentID page and send Class_ID + ActivitiesRooms
-  //       navigate(`/class/${code}`);
-  //     } else {
-  //       // ❌ Show error message on screen, no alert
-  //       setError(data.message || "Invalid room code");//(data.message || "Invalid room code");
-  //     }
-  //   });
-  // };
-
   // 🔥 connect + listen result แค่ครั้งเดียว
   useEffect(() => {
     if (!socket.connected) {

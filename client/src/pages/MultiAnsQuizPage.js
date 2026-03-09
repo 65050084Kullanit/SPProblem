@@ -1,203 +1,7 @@
-
-// import { useState, useEffect } from "react";
-// import Navbar from "../Navbar";
-// import { socket } from "../socket";
-// import { Maximize2 } from "lucide-react";
-
-
-// function MultiAnsQuizPage({
-//   question,
-//   timeLimit,
-//   isQuizTimer,
-//   currentQuestion,
-//   totalQuestions,
-//   onSubmit,
-// }) {
-//   const [selectedChoices, setSelectedChoices] = useState([]);
-//   const [timer, setTimer] = useState(() =>
-//     Number.isFinite(timeLimit) ? timeLimit : 0
-//   );
-
-//   const [locked, setLocked] = useState(false);
-//   const [startTime, setStartTime] = useState(Date.now());
-//   const [showImage, setShowImage] = useState(false);
-
-
-//   const autoSubmit = () => {
-//     if (locked) return;
-//     setLocked(true);
-
-//     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-//     onSubmit(selectedChoices, timeSpent);
-//   };
-
-//   /* ⏱ reset เมื่อเปลี่ยนข้อ (เฉพาะที่ไม่ใช่ quiztimer)*/
-//   useEffect(() => {
-//     if (isQuizTimer) return;   // ❗ ห้าม reset
-//     //  if (typeof timeLimit !== "number" || Number.isNaN(timeLimit)) return;
-//     setTimer(timeLimit);
-//     setLocked(false);
-//     setSelectedChoices([]);
-//     setStartTime(Date.now());
-//   }, [question.Question_ID]);
-
-//   //countdown (เฉพาะที่ไม่ใช่ quiztimer)
-//   useEffect(() => {
-//     if (isQuizTimer) return;
-//     if (locked) return;
-//     if (!Number.isFinite(timer)) return;
-
-//     if (timer <= 0) {
-//       autoSubmit();
-//       return;
-//     }
-
-//     const i = setInterval(() => {
-//       setTimer(t => (Number.isFinite(t) ? t - 1 : 0));
-//     }, 1000);
-
-//     return () => clearInterval(i);
-//   }, [timer, locked, isQuizTimer]);
-
-//   //sync Quiz Timer (แสดงอย่างเดียว)
-//   useEffect(() => {
-//     if (!isQuizTimer) return;
-//     if (!Number.isFinite(timeLimit)) return;
-
-//     setTimer(timeLimit);
-//   }, [timeLimit, isQuizTimer]);
-
-//   /* 👩‍🏫 ครูกดตัดข้อ */
-//   useEffect(() => {
-//     socket.on("force_submit", autoSubmit);
-//     return () => socket.off("force_submit", autoSubmit);
-//   }, []);
-
-//   const toggle = (id) => {
-//     if (locked) return;
-
-//     setSelectedChoices((prev) =>
-//       prev.includes(id)
-//         ? prev.filter((x) => x !== id)
-//         : [...prev, id]
-//     );
-//   };
-
-//   const formatTime = (seconds) => {
-//     if (!Number.isFinite(seconds)) return "";
-
-//     const m = Math.floor(seconds / 60);
-//     const s = seconds % 60;
-
-//     return `${m}:${s.toString().padStart(2, "0")}`;
-//   };
-
-//   return (
-//     <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px]">
-//       <Navbar />
-
-//       <div className="bg-gray-300 px-6 py-2 rounded-xl self-end">
-//         Now Question {currentQuestion}/{totalQuestions}
-//       </div>
-
-//       <div className="w-11/12 bg-gray-300 py-10 text-center text-xl rounded-lg">
-//         {question.Question_Text}
-//       </div>
-
-//       {/* Choose text */}
-//       <p className="text-gray-700 mb-3">select all correct choices</p>
-
-
-
-//     {/* 🖼 Image (ถ้ามี) */}
-//       {question.Question_Image && (
-//         <div className="w-[300px] h-[300px] bg-gray-300 rounded-lg mb-4 relative">
-//           <img
-//             src={question.Question_Image}
-//             alt="question"
-//             className="w-full h-full object-contain"
-//           />
-
-//           <button
-//             onClick={() => setShowImage(true)}
-//             className="bg-black text-white px-3 py-1 rounded-lg absolute bottom-2 right-2 opacity-80"
-//           >
-//             <Maximize2 className="w-5 h-5" />
-//           </button>
-//         </div>
-//       )}
-
-//       {/* Fullscreen Image */}
-//       {showImage && (
-//         <div
-//           className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
-//           onClick={() => setShowImage(false)}
-//         >
-//           <img
-//             src={question.Question_Image}
-//             className="max-w-[90%] max-h-[90%] object-contain rounded-lg"
-//             alt="full"
-//           />
-//         </div>
-//       )}
-
-//       <div className="w-11/12 space-y-3 mt-4">
-//         {question.choices.map((c) => (
-//           <button
-//             key={c.Option_ID}
-//             onClick={() => toggle(c.Option_ID)}
-//             disabled={locked}
-//             className={`w-full py-4 rounded-2xl transition ${
-//               selectedChoices.includes(c.Option_ID)
-//                 ? "bg-green-300"
-//                 : "bg-gray-300"
-//             } ${locked ? "opacity-50" : ""}`}
-//           >
-//             {c.Option_Text}
-//           </button>
-//         ))}
-//       </div>
-
-//       <div className="w-11/12 grid grid-cols-3 items-center mt-10">
-
-//         {/* ซ้าย */}
-//         <div>
-//           {!isQuizTimer && Number.isFinite(timer) && (
-//             <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl bg-gray-300">
-//               {formatTime(timer)}
-//             </div>
-//           )}
-//         </div>
-
-//         {/* กลาง spacer */}
-//         <div></div>
-
-//         {/* ขวา */}
-//         <div className="flex justify-end">
-//           <button
-//             disabled={locked || selectedChoices.length === 0}
-//             onClick={autoSubmit}
-//             className="w-72 bg-gray-600 text-white px-10 py-3 rounded-2xl disabled:opacity-50"
-//           >
-//             Next
-//           </button>
-//         </div>
-
-//       </div>
-
-//     </div>
-//   );
-// }
-
-// export default MultiAnsQuizPage;
-
-
-
-
 import { useState, useEffect, useRef } from "react";
 import Navbar from "../Navbar";
 import { socket } from "../socket";
-import { Maximize2 } from "lucide-react";
+import { Maximize2 ,Clock } from "lucide-react";
 
 
 function MultiAnsQuizPage({
@@ -322,25 +126,27 @@ function MultiAnsQuizPage({
   };
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px]">
+    <div className="w-full min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center py-6">
       <Navbar />
 
-      <div className="bg-gray-300 px-6 py-2 rounded-xl self-end">
+      {/* Progress */}
+      <p className="mt-16 mb-4 text-slate-400 font-medium">
         Now Question {currentQuestion}/{totalQuestions}
-      </div>
+      </p>
 
-      <div className="w-11/12 bg-gray-300 py-10 text-center text-xl rounded-lg">
+      {/* Question */}
+      <div className="w-11/12 max-w-3xl bg-slate-800 border border-slate-700 p-6 rounded-2xl text-center text-xl font-semibold mb-4">
         {question.Question_Text}
       </div>
 
-      {/* Choose text */}
-      <p className="text-gray-700 mb-3">select all correct choices</p>
+      {/* Instruction */}
+      <p className="text-cyan-300 mb-3 font-medium">
+        Select all correct choices
+      </p>
 
-
-
-    {/* 🖼 Image (ถ้ามี) */}
+      {/* Image */}
       {question.Question_Image && (
-        <div className="w-[300px] h-[300px] bg-gray-300 rounded-lg mb-4 relative">
+        <div className="w-[240px] h-[240px] bg-slate-800 border border-slate-700 rounded-xl mb-4 relative">
           <img
             src={question.Question_Image}
             alt="question"
@@ -349,7 +155,7 @@ function MultiAnsQuizPage({
 
           <button
             onClick={() => setShowImage(true)}
-            className="bg-black text-white px-3 py-1 rounded-lg absolute bottom-2 right-2 opacity-80"
+            className="absolute bottom-2 right-2 bg-slate-900 text-slate-100 px-3 py-1 rounded-lg"
           >
             <Maximize2 className="w-5 h-5" />
           </button>
@@ -359,61 +165,72 @@ function MultiAnsQuizPage({
       {/* Fullscreen Image */}
       {showImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
           onClick={() => setShowImage(false)}
         >
           <img
             src={question.Question_Image}
-            className="max-w-[90%] max-h-[90%] object-contain rounded-lg"
+            className="max-w-[90%] max-h-[90%]"
             alt="full"
           />
         </div>
       )}
 
-      <div className="w-11/12 space-y-3 mt-4">
+      {/* Choices */}
+      <div className="w-11/12 max-w-3xl space-y-3 mt-4">
         {question.choices.map((c) => (
           <button
             key={c.Option_ID}
             onClick={() => toggle(c.Option_ID)}
             disabled={locked}
-            className={`w-full py-4 rounded-2xl transition ${
+            className={`w-full py-4 rounded-xl transition font-medium
+            ${
               selectedChoices.includes(c.Option_ID)
-                ? "bg-green-300"
-                : "bg-gray-300"
-            } ${locked ? "opacity-50" : ""}`}
+                ? "bg-cyan-500 text-slate-900"
+                : "bg-slate-800 border border-slate-700 hover:bg-slate-700"
+            }
+            ${locked ? "opacity-50 cursor-not-allowed" : ""}
+            `}
           >
             {c.Option_Text}
           </button>
         ))}
       </div>
 
-      <div className="w-11/12 grid grid-cols-3 items-center mt-10">
+      {/* Footer */}
+      <div className="mt-8 w-11/12 max-w-3xl flex items-center justify-between">
 
-        {/* ซ้าย */}
+        {/* Timer */}
         <div>
           {!isQuizTimer && Number.isFinite(timer) && (
-            <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl bg-gray-300">
-              {formatTime(timer)}
+            <div
+              className={`px-4 py-2 rounded-full font-semibold flex items-center gap-2
+              ${
+                timer <= 5
+                  ? "bg-red-500 text-white"
+                  : "bg-cyan-700 text-slate-100"
+              }`}
+            >
+              <Clock size={18} />
+              <span>{formatTime(timer)}s</span>
             </div>
           )}
         </div>
 
-        {/* กลาง spacer */}
-        <div></div>
-
-        {/* ขวา */}
-        <div className="flex justify-end">
-          <button
-            disabled={locked || selectedChoices.length === 0}
-            onClick={autoSubmit}
-            className="w-72 bg-gray-600 text-white px-10 py-3 rounded-2xl disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
+        {/* Next */}
+        <button
+          disabled={locked || selectedChoices.length === 0}
+          onClick={autoSubmit}
+          className="px-6 py-3 rounded-lg
+          bg-cyan-400 text-slate-900 font-semibold
+          hover:bg-cyan-300 hover:scale-[1.02]
+          shadow-lg shadow-cyan-400/30
+          transition disabled:opacity-50"
+        >
+          Next
+        </button>
 
       </div>
-
     </div>
   );
 }

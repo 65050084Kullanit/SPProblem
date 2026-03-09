@@ -207,22 +207,20 @@ function RankingPage({ activitySessionId, studentId, mode }) {
   }
 
   return (
-    <div className="w-full min-h-screen bg-grey-100 flex flex-col items-center pt-[80px] pb-16">
+    <div className="w-full min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center pt-[80px] pb-16">
       <Navbar />
-      
 
       <h1 className="text-4xl font-bold mt-8">Ranking</h1>
-
 
       <div className="relative mt-16">
 
         {displayRank >= 1 && displayRank <= 5 && (
           <Crown
-            className="w-16 h-16 absolute -top-10 left-1/3 -translate-x-1/2 text-yellow-500  animate-bounce z-10"
+            className="w-16 h-16 absolute -top-10 left-1/3 -translate-x-1/2 text-amber-400 animate-bounce z-10"
           />
         )}
 
-        <div className="relative w-[220px] h-[220px] rounded-full overflow-hidden bg-white ">
+        <div className="relative w-[220px] h-[220px] rounded-full overflow-hidden bg-slate-800 border-4 border-slate-700 shadow-[0_0_30px_rgba(34,211,238,0.35)]">
           <img src={avatar?.bodyPath} className="absolute inset-0 w-full h-full object-contain" />
           <img src={avatar?.costumePath} className="absolute inset-0 w-full h-full object-contain" />
           <img src={avatar?.hairPath} className="absolute inset-0 w-full h-full object-contain" />
@@ -236,24 +234,33 @@ function RankingPage({ activitySessionId, studentId, mode }) {
         <>
           <p className="text-2xl font-bold mt-4">{stageName}</p>
 
-          <h2 className="text-3xl font-bold mt-6">Your Rank</h2>
+          <h2 className="text-3xl font-bold mt-6 text-slate-300">
+            Your Rank
+          </h2>
+
           <div className="flex items-center gap-2 mt-1">
-            <Crown className="w-6 h-6" />
-            <p className="text-2xl font-semibold">#{myRank}</p>
+            <Crown className="w-6 h-6 text-amber-400" />
+            <p className="text-3xl font-bold text-cyan-400">#{myRank}</p>
           </div>
         </>
       ) : (
         // 👥 team mode
         <>
-          <p className="text-2xl font-bold mt-4">{teamName}</p>
+          <p className="text-2xl font-bold mt-4 text-cyan-400">{teamName}</p>
 
-          <h2 className="text-3xl font-bold mt-6">Team Score</h2>
-          <p className="text-3xl font-semibold text-blue-600">{teamScore}</p>
+          <h2 className="text-3xl font-bold mt-6 text-slate-300">
+            Team Score
+          </h2>
 
-          <h2 className="text-3xl font-bold mt-6">Your Team Rank</h2>
+          <p className="text-3xl font-semibold text-cyan-400">{teamScore}</p>
+
+          <h2 className="text-3xl font-bold mt-6 text-slate-300">
+            Your Team Rank
+          </h2>
+
           <div className="flex items-center gap-2 mt-1">
-            <Crown className="w-6 h-6" />
-            <p className="text-2xl font-semibold">#{teamRank}</p>
+            <Crown className="w-6 h-6 text-amber-400" />
+            <p className="text-3xl font-bold text-cyan-400">#{teamRank}</p>
           </div>
         </>
       )}

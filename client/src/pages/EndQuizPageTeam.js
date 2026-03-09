@@ -107,7 +107,7 @@ export default function EndQuizPageTeam() {
 
   return (
 
-    <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px]">
+    <div className="w-full min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center pt-[80px]">
 
       <Navbar />
 
@@ -116,30 +116,36 @@ export default function EndQuizPageTeam() {
       </h1>
 
       {/* Avatar */}
-      <div className="relative w-48 h-48 rounded-full overflow-hidden bg-white mt-8">
+      <div className="relative w-[220px] h-[220px] rounded-full overflow-hidden bg-slate-800 border-4 border-slate-700 shadow-[0_0_30px_rgba(34,211,238,0.35)]">
+
         <img src={avatar?.bodyPath} className="absolute inset-0 w-full h-full object-contain" />
         <img src={avatar?.costumePath} className="absolute inset-0 w-full h-full object-contain" />
         <img src={avatar?.hairPath} className="absolute inset-0 w-full h-full object-contain" />
         <img src={avatar?.facePath} className="absolute inset-0 w-full h-full object-contain" />
+
       </div>
 
-      <p className="text-xl font-bold mt-6">
+      {/* Team Name */}
+      <p className="text-xl font-bold mt-6 text-cyan-400">
         {teamName}
       </p>
 
-      <p className="text-gray-500">
+      {/* Player Name */}
+      <p className="text-slate-400">
         {playerName}
       </p>
 
-      <h2 className="text-2xl font-medium mt-6">
+      {/* Score */}
+      <h2 className="text-2xl font-medium mt-6 text-slate-300">
         Your Final Score :
       </h2>
 
-      <p className="text-4xl font-bold">
+      <p className="text-4xl font-bold text-cyan-400 mt-1">
         {finalScore}
       </p>
 
-      <p className="text-md mt-8 text-gray-500">
+      {/* Waiting */}
+      <p className="text-md mt-8 text-slate-400 italic">
         Waiting for teacher to reveal final team result...
       </p>
 

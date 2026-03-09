@@ -130,15 +130,15 @@ export default function StudentTeamPreviewPage() {
   // =============================
   return (
 
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center justify-center px-4">
 
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">
         Your Team
       </h1>
 
-      <div className="bg-white rounded-xl shadow p-8 w-full max-w-md">
+      <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-8 w-full max-w-md">
 
-        <h2 className="text-xl md:text-2xl font-semibold mb-8 text-center">
+        <h2 className="text-xl md:text-2xl font-semibold mb-8 text-center text-cyan-400">
           {myTeam.teamName}
         </h2>
 
@@ -182,7 +182,7 @@ export default function StudentTeamPreviewPage() {
               </div>
 
               {/* Name */}
-              <p className="mt-2 text-sm md:text-lg font-medium text-center">
+              <p className="mt-2 text-sm md:text-lg font-medium text-center text-slate-200">
                 {member.Student_Name}
               </p>
 
@@ -194,7 +194,7 @@ export default function StudentTeamPreviewPage() {
 
       </div>
 
-      <p className="mt-6 text-gray-500 text-center">
+      <p className="mt-6 text-slate-400 text-center italic">
         Waiting for teacher to start...
       </p>
 

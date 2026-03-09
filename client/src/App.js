@@ -5,6 +5,8 @@ import JoinRoom from "./pages/JoinRoom";
 import StudentID from "./pages/StudentID";
 import SelectAvatar from "./pages/SelectAvatar";
 import Lobby from "./pages/Lobby";
+import RoomPollStudent from "./pages/RoomPollStudents";
+
 import QuizPage from "./pages/QuizPage";
 import EndQuizPageIndividual from "./pages/EndQuizPageIndividual";
 import EndQuizPageTeam from "./pages/EndQuizPageTeam";
@@ -12,6 +14,7 @@ import TeamRanking from "./pages/FinalTeamRankingPage";
 import FinalIndividualRankingPage from "./pages/FinalIndividualRankingPage";
 import GameAnalysis from "./pages/GameAnalysis";
 import StudentTeamPreviewPage from "./pages/StudentTeamPreviewPage";
+import OpenChat from "./pages/OpenChat";
 
 
 import OneAnsQuizPage from "./pages/OneAnsQuizPage3";
@@ -20,7 +23,6 @@ import AnswerResultPage from "./pages/AnswerResultPage";
 import RankingPage from "./pages/RankingPage";
 // import GameAnalysis from "./pages/GameAnalysis";
 import Poll from "./pages/Poll";
-import OpenChat from "./pages/OpenChat";
 
 import OneSquare from "./pages/OneAnsSquare";
 import OneSquare2 from "./pages/OneAnsSquare2";
@@ -41,6 +43,8 @@ function App() {
         <Route path="/class/:joinCode" element={<StudentID />} />
         <Route path="/class/:joinCode/student/:studentId/avatar" element={<SelectAvatar />} />
         <Route path="/class/:joinCode/lobby" element={<Lobby />} />
+        <Route path="/class/:joinCode/lobby/chat/:activitySessionId" element={<OpenChat />}/>
+        <Route path="/class/:joinCode/lobby/poll/:activitySessionId" element={<RoomPollStudent />}/>
         <Route path="/class/:joinCode/lobby/team/:activitySessionId" element={<StudentTeamPreviewPage />} />
         <Route path="/class/:joinCode/lobby/quiz/:activitySessionId" element={<QuizPage />} />
         <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end" element={<EndQuizPageIndividual />} />

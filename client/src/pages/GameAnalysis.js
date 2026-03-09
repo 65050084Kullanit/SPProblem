@@ -72,38 +72,88 @@ function GameAnalysis({
   }, [activitySessionId, questions]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+<div className="min max-w-4xl mx-auto min-h-screen bg-slate-900 text-slate-100 flex flex-col">
 
-      {/* CONTENT */}
-      <div className="flex-1 overflow-y-auto px-4 pt-6 space-y-6">
-        <h1 className="text-2xl font-bold">Game Analysis</h1>
+<div className="h-5" />
+
+  <div className="px-4 pt-6 pb-4">
+    <h1 className="text-3xl font-bold text-center">
+      Game Analysis
+    </h1>
+  </div>
+
+  <div className="h-3" />
+
+  <div className="flex-1 overflow-y-auto px-4 pb-28 space-y-6">
 
         {questions.map((q, index) => (
-          <div key={q.Question_ID} className="border rounded-xl p-5 bg-white">
-            <h2 className="font-semibold">
-              ข้อ {index + 1}: {q.Question_Text}
-            </h2>
 
-            {analysisMap[q.Question_ID] && (
+          <div
+            key={q.Question_ID}
+            className="bg-slate-800 border border-slate-700 rounded-2xl p-5"
+          >
+
+            {/* Question Header */}
+
+            <div className="mb-3">
+
+              <div className="text-xs text-slate-400 mb-1">
+                Question {index + 1}
+              </div>
+
+              <div className="font-medium">
+                {q.Question_Text}
+              </div>
+
+            </div>
+
+
+            {/* Analysis */}
+
+            {analysisMap[q.Question_ID] ? (
+
               <QuestionAnalysisDetail
                 analysis={analysisMap[q.Question_ID]}
               />
+
+            ) : (
+
+              <div className="text-sm text-slate-500">
+                Loading analysis...
+              </div>
+
             )}
+
           </div>
+
         ))}
-        {beforePageState === "Play_Quiz" && (
-          <div className="sticky bottom-0 bg-white border-t p-4 z-50">
 
-            <button
-              // onClick={() => navigate("/quiz_report", {state: { activitySessionId, beforePage, classId, joinCode }})}
-              onClick={() => navigate(-1)}
-              className="w-full py-3 bg-gray-600 text-white rounded-xl"
-            >
-              Back
-            </button>
-
-          </div>)}
       </div>
+
+
+
+      {/* FOOTER BUTTON */}
+
+      {beforePageState === "Play_Quiz" && (
+
+        <div className="flex flex-col items-center gap-3 pb-12">
+
+          <button
+            onClick={() => navigate(-1)}
+            className="
+            w-72 py-3 rounded-lg
+            bg-cyan-400 text-slate-900 font-semibold
+            hover:bg-cyan-300
+            shadow-lg shadow-cyan-400/30
+            transition"
+          >
+            Back
+          </button>
+
+        </div>
+
+      )}
+
     </div>
 
   );

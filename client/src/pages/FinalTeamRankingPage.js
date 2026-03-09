@@ -95,7 +95,8 @@ function FinalTeamRankingPage() {
 
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px] pb-10">
+
+    <div className="w-full min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center pt-[80px] pb-10">
 
       <Navbar />
 
@@ -108,11 +109,11 @@ function FinalTeamRankingPage() {
 
         {(teamRank >= 1 && teamRank <= 5) && (
           <Crown
-            className="w-16 h-16 absolute -top-10 left-1/2 -translate-x-1/2 text-yellow-500 animate-bounce z-10"
+            className="w-16 h-16 absolute -top-10 left-1/3 -translate-x-1/2 text-amber-400 animate-bounce z-10"
           />
         )}
 
-        <div className="relative w-[220px] h-[220px] rounded-full overflow-hidden bg-white">
+        <div className="relative w-[220px] h-[220px] rounded-full overflow-hidden bg-slate-800 border-4 border-slate-700 shadow-[0_0_30px_rgba(34,211,238,0.35)]">
 
           <img src={avatar?.bodyPath} className="absolute inset-0 w-full h-full object-contain"/>
           <img src={avatar?.costumePath} className="absolute inset-0 w-full h-full object-contain"/>
@@ -124,46 +125,48 @@ function FinalTeamRankingPage() {
       </div>
 
       {/* Team Name */}
-      <p className="text-2xl font-bold mt-4">
+      <p className="text-2xl font-bold mt-4 text-cyan-400">
         {teamName}
       </p>
 
       {/* Player Name */}
-      <p className="text-gray-500">
+      <p className="text-slate-400">
         {playerName}
       </p>
 
       {/* Player Score */}
-      <h2 className="text-2xl font-medium mt-6">
+      <h2 className="text-2xl font-medium mt-6 text-slate-300">
         Your Final Score :
       </h2>
 
-      <p className="text-4xl font-bold">
+      <p className="text-4xl font-bold text-cyan-400">
         {playerScore}
       </p>
 
       {/* Team Score */}
-      <h2 className="text-2xl font-medium mt-6">
+      <h2 className="text-2xl font-medium mt-6 text-slate-300">
         Final Team Score :
       </h2>
 
-      <p className="text-3xl font-bold">
+      <p className="text-3xl font-bold text-cyan-400">
         {teamScore}
       </p>
 
       {/* Team Rank */}
-      <h2 className="text-2xl font-medium mt-6">
+      <h2 className="text-2xl font-medium mt-6 text-slate-300">
         Your Team Rank :
       </h2>
 
       <div className="flex items-center gap-2 mt-1">
 
         {(teamRank >= 1 && teamRank <= 5) && (
-          <Crown className="w-6 h-6"/>
+          <Crown className="w-6 h-6 text-amber-400"/>
         )}
-        <p className="text-2xl font-semibold">
+
+        <p className="text-3xl font-bold text-cyan-400">
           {teamRank !== null ? `#${teamRank}` : "-"}
         </p>
+
       </div>
 
       <div className="mt-16 w-full flex flex-col items-center space-y-6">
@@ -174,7 +177,10 @@ function FinalTeamRankingPage() {
               state: { activitySessionId, studentId }
             })
           }
-          className="bg-gray-600 text-white w-10/12 py-4 rounded-2xl text-lg hover:bg-gray-400"
+          className="
+            bg-cyan-400 text-slate-900 w-10/12 py-4 rounded-xl text-lg font-semibold
+            hover:bg-cyan-300 transition-all duration-200 active:scale-95
+          "
         >
           Game Analysis
         </button>
@@ -182,6 +188,7 @@ function FinalTeamRankingPage() {
       </div>
 
     </div>
+
   );
 }
 

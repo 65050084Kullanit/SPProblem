@@ -193,7 +193,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Navbar from "../Navbar";
-import { Maximize2 } from "lucide-react";
+import { Maximize2 , Clock} from "lucide-react";
 import { socket } from "../socket";
 
 function OneAnsQuizPage({
@@ -315,21 +315,27 @@ function OneAnsQuizPage({
 
   console.log("QUESTION IMAGE =", question.Question_Image);
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center pt-[80px]">
+    <div className="w-full min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center py-6">
       <Navbar />
 
-      <div className="bg-gray-300 px-6 py-2 rounded-xl self-end">
+      {/* Progress */}
+      <p className="mt-16 mb-4 text-slate-400 font-medium">
         Now Question {currentQuestion}/{totalQuestions}
-      </div>
+      </p>
 
-      <div className="w-11/12 bg-gray-300 py-10 text-center text-xl rounded-lg mt-4">
+      {/* Question */}
+      <div className="w-11/12 max-w-3xl bg-slate-800 border border-slate-700 p-6 rounded-2xl text-center text-xl font-semibold mb-4">
         {question.Question_Text}
       </div>
 
-      <p className="text-gray-700 mb-3">choose 1 choice</p>
+      {/* Instruction */}
+      <p className="text-cyan-300 mb-3 font-medium">
+        Choose 1 choice
+      </p>
 
+      {/* Image */}
       {question.Question_Image && (
-        <div className="w-[300px] h-[300px] bg-gray-300 mt-4 relative rounded-lg">
+        <div className="w-[220px] h-[220px] bg-slate-800 border border-slate-700 rounded-xl mb-4 relative">
           <img
             src={question.Question_Image}
             className="w-full h-full object-contain"
@@ -337,14 +343,15 @@ function OneAnsQuizPage({
           />
           <button
             onClick={() => setShowImage(true)}
-            className="absolute bottom-2 right-2 bg-black text-white p-1 rounded"
+            className="absolute bottom-2 right-2 bg-slate-900 text-slate-100 px-3 py-1 rounded-lg"
           >
             <Maximize2 />
           </button>
         </div>
       )}
 
-      <div className="w-11/12 space-y-3 mt-6">
+      {/* Choices */}
+      <div className="w-11/12 max-w-3xl space-y-3 mt-4">
         {question.choices.map((c) => (
           <button
             key={c.Option_ID}
@@ -362,10 +369,11 @@ function OneAnsQuizPage({
 
               onSubmit([c.Option_ID], timeSpent);
             }}
-            className={`w-full py-4 rounded-2xl ${
+            className={`w-full py-4 rounded-xl font-medium transition
+            ${
               selectedChoice === c.Option_ID
-                ? "bg-gray-500 text-white"
-                : "bg-gray-300"
+                ? "bg-cyan-500 text-slate-900"
+                : "bg-slate-800 border border-slate-700 hover:bg-slate-700"
             }`}
           >
             {c.Option_Text}
@@ -373,17 +381,27 @@ function OneAnsQuizPage({
         ))}
       </div>
 
-      <div className="w-11/12 grid grid-cols-3 items-center mt-10">
-        <div>
-          {Number.isFinite(timer) && (
-            <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl">
-              {formatTime(timer)}
-            </div>
-          )}
-        </div>
-        <div></div>
+      {/* Footer */}
+      <div className="mt-8 w-11/12 max-w-3xl flex items-center justify-between">
+
+        {/* Timer */}
+        {Number.isFinite(timer) && (
+          <div
+            className={`px-4 py-2 rounded-full font-semibold  flex items-center gap-2
+            ${
+              timer <= 5
+                ? "bg-red-500 text-white"
+                : "bg-cyan-700 text-slate-100"
+            }`}
+          >
+            <Clock size={18} />
+            <span>{formatTime(timer)}s</span>
+          </div>
+        )}
+
       </div>
 
+      {/* Full image */}
       {showImage && (
         <div
           className="fixed inset-0 bg-black/80 flex items-center justify-center"

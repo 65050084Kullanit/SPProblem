@@ -218,102 +218,30 @@ function SelectAvatar() {
 
   
   return (
-    <div className="flex flex-col items-center justify-center h-screen p-4">
-      <h1 className="text-base mb-6">Do you want to change a stage name?</h1>
+    <div className="flex flex-col items-center justify-center h-screen p-4 bg-slate-900">
 
-      {/* Input box */}
+      <h1 className="text-base text-slate-100 mb-6">
+        Do you want to change a stage name?
+      </h1>
+
+      {/* Name Input */}
       <input
         type="text"
         placeholder={studentNumber}
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="text-sm text-black w-[252px] h-[61px] px-4 py-2 placeholder-gray-700 bg-gray-300 border border-gray-500 rounded-md focus:ring-1 focus:ring-gray-700 outline-none mb-6"
+        className="text-sm text-slate-100 w-[252px] h-[61px] px-4 py-2 placeholder-slate-400 bg-slate-800 border border-slate-700 rounded-md focus:ring-2 focus:ring-cyan-400 outline-none mb-6"
       />
 
       {/* Avatar Preview */}
-      {/* <div className="relative w-[100px] h-[100px] rounded-full bg-gray-200 flex items-center justify-center text-4xl">
-        {selectedBody.id !== 0 && (
-          <img
-            src={selectedBody.path}
-            alt="bodies"
-            className="absolute w-full bottom-0 object-contain"
-          />
-        )}
-        {selectedMask.id !== 0 && (
-          <img
-            src={selectedMask.path}
-            alt="masks"
-            className="absolute w-full h-full object-cover rounded-full"
-          />
-        )}
-        {selectedAccessory.id !== 0 && (
-          <img
-            src={selectedAccessory.path}
-            alt="accessories"
-            className="absolute w-1/2 top-0 left-1/4 object-contain"
-          />
-        )}
-        {selectedCostume.id !== 0 && (
-          <img
-            src={selectedCostume.path}
-            alt="costumes"
-            className="absolute w-full bottom-0 object-contain"
-          />
-        )}
-      </div> */}
-
-      {/* <div className="relative w-[100px] h-[100px]">
-        <img src={selectedBody?.path} alt="body" className="absolute inset-0 w-full h-full" />
-        <img src={selectedCostume?.path} alt="costume" className="absolute inset-0 w-full h-full" />
-        <img src={selectedMask?.path} alt="mask" className="absolute inset-0 w-full h-full" />
-        <img src={selectedAccessory?.path} alt="accessory" className="absolute inset-0 w-full h-full" />
-      </div> */}
-
-      <div className="relative w-[200px] h-[200px]">
-        <img
-          src={selectedBody?.path}
-          alt="body"
-          className="absolute inset-0 w-full h-full object-contain"
-        />
-        <img
-          src={selectedCostume?.path}
-          alt="costume"
-          className="absolute inset-0 w-full h-full object-contain"
-        />
-        <img
-          src={selectedMask?.path}
-          alt="mask"
-          className="absolute inset-0 w-full h-full object-contain"
-        />
-        <img
-          src={selectedAccessory?.path}
-          alt="accessory"
-          className="absolute inset-0 w-full h-full object-contain"
-        />
+      <div className="relative w-[200px] h-[200px] bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center">
+        <img src={selectedBody?.path} className="absolute inset-0 w-full h-full object-contain" />
+        <img src={selectedAccessory?.path} className="absolute inset-0 w-full h-full object-contain" />
+        <img src={selectedCostume?.path} className="absolute inset-0 w-full h-full object-contain" />
+        <img src={selectedMask?.path} className="absolute inset-0 w-full h-full object-contain" />
       </div>
 
-      {/* Category Selectors */}
-      {/* <div className="flex gap-4 mt-6">
-        {["bodies", "accessories", "masks", "costumes"].map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`w-[40px] h-[40px] rounded-full flex items-center justify-center text-lg cursor-pointer
-              ${
-                selectedCategory === cat
-                  ? "bg-gray-400 border-2 border-blue-500"
-                  : "bg-gray-200"
-              }`}
-          >
-            {cat === "bodies" && "😀"}
-            {cat === "accessories" && "🎩"}
-            {cat === "masks" && "😷"}
-            {cat === "costumes" && "👕"}
-          </button>
-        ))}
-      </div> */}
-
-      {/* Category Selectors */}
+      {/* Category */}
       <div className="flex gap-6 mt-6">
         {categories.map((cat) => (
           <div key={cat.key} className="flex flex-col items-center">
@@ -322,22 +250,22 @@ function SelectAvatar() {
               className={`w-[50px] h-[50px] rounded-full flex items-center justify-center transition-all duration-200
                 ${
                   selectedCategory === cat.key
-                    ? "bg-blue-500 text-white scale-110 shadow-lg"
-                    : "bg-gray-200 hover:bg-gray-300"
+                    ? "bg-cyan-400 text-slate-900 scale-110"
+                    : "bg-slate-700 text-slate-200 hover:bg-slate-600"
                 }`}
             >
               {cat.icon}
             </button>
 
-            <span className="text-xs mt-1 text-gray-600">
+            <span className="text-xs mt-1 text-slate-400">
               {cat.label}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Options Grid */}
-      <div className="grid grid-cols-3 gap-3 mt-6 border p-4 rounded-lg mb-4">
+      {/* Options */}
+      <div className="grid grid-cols-3 gap-3 mt-6 border border-slate-700 p-4 rounded-lg mb-4 bg-slate-800">
         {getOptions().map((item) => (
           <div
             key={item.id}
@@ -349,26 +277,27 @@ function SelectAvatar() {
                   (selectedCategory === "accessories" && selectedAccessory?.id === item.id) ||
                   (selectedCategory === "masks" && selectedMask?.id === item.id) ||
                   (selectedCategory === "costumes" && selectedCostume?.id === item.id))
-                  ? "border-2 border-blue-500"
-                  : "bg-gray-300"
+                  ? "border-2 border-cyan-400 bg-slate-700"
+                  : "bg-slate-700 hover:bg-slate-600"
               }`}
           >
             <img
               src={item.path}
               alt="option"
-              className={`w-full h-full object-cover rounded-full`}
+              className="w-full h-full object-cover rounded-full"
             />
           </div>
         ))}
       </div>
 
-      {/* Finish Button */}
+      {/* Confirm */}
       <button
         onClick={handleConfirm}
-        className="text-base w-[196px] h-[46px] py-3 mb-3 bg-gray-300 text-black rounded-md hover:bg-gray-700 transition self-center"
+        className="text-base w-[196px] h-[46px] py-3 mb-3 bg-cyan-400 text-slate-900 rounded-md hover:bg-cyan-300 transition self-center"
       >
-        I'am already!
+        I'm already!
       </button>
+
     </div>
   );
 }
