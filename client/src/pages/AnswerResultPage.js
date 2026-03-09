@@ -430,8 +430,17 @@ function AnswerResultPage({
 
       {/* Point */}
       <h2 className="text-3xl font-bold mt-10">Point</h2>
+
       <p className="text-xl mt-2">
-        correct answer : <span className="font-bold">{pointForThis}</span>
+        {isCorrect ? (
+          <>
+            correct answer : <span className="font-bold">{pointForThis}</span>
+          </>
+        ) : (
+          <>
+            wrong answer : <span className="font-bold">{pointForThis}</span>
+          </>
+        )}
       </p>
 
       {/* Time spent */}

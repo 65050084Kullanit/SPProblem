@@ -20,6 +20,23 @@ function GameAnalysis({
   const beforePageState = beforePage || "Play_Quiz";
 
   console.log("GameAnalysis activitySessionId =", activitySessionId, " beforePage =", beforePage);
+  const { joinCode } = useParams();
+
+  useEffect(() => {
+
+    const handleKick = () => {
+      console.log("🚪 activity ended");
+
+      localStorage.removeItem("activity_session");
+
+      navigate(`/class/${joinCode}/lobby`, { replace: true });
+    };
+
+    socket.on("force_back_to_lobby", handleKick);
+
+    return () => socket.off("force_back_to_lobby", handleKick);
+
+  }, [joinCode]);
 
   /* โหลดคำถาม */
   useEffect(() => {

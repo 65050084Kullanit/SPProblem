@@ -433,11 +433,13 @@ export default function QuizPage() {
     quizId,
     studentId,
     quizStartTime,
-    serverTime
+    serverTime,
+    mode
 
   } = safeState;
   console.log("quizStartTime =", quizStartTime);
   console.log("timeLimit =", timeLimit);
+  const isTeamMode = mode === "team";
   const [rank, setRank] = useState(null);
 
 
@@ -504,6 +506,7 @@ export default function QuizPage() {
         activitySessionId,
         quizId,
         studentId,
+        mode
       })
     );
 
@@ -595,6 +598,7 @@ export default function QuizPage() {
       setQuizRemainingTime(remaining);
 
       if (remaining <= 0) {
+        clearInterval(interval); // 🔥 หยุดทันที
         socket.emit("force_submit", { activitySessionId });
         socket.emit("end_quiz", { activitySessionId });
       }
@@ -674,33 +678,66 @@ export default function QuizPage() {
   /* ================= QUIZ ENDED ================= */
 
   useEffect(() => {
-    const handleQuizEnd = () => {
-      setQuizEnded(true);
+
+    const handleQuizEnd = (data = {}) => {
+
+      const eventMode = data.mode ?? mode;
+
+      if (eventMode === "team" && timerType === "teacher") {
+
+        navigate(
+          `/class/${joinCode}/lobby/quiz/${activitySessionId}/end/team`,
+          {
+            state: { activitySessionId, studentId }
+          }
+        );
+
+      } else if (eventMode === "team") {
+
+        navigate(
+          `/class/${joinCode}/lobby/quiz/${activitySessionId}/endteam`,
+          {
+            state: { activitySessionId, studentId }
+          }
+        );
+
+      } else {
+
+        navigate(
+          `/class/${joinCode}/lobby/quiz/${activitySessionId}/end`,
+          {
+            state: { activitySessionId, studentId }
+          }
+        );
+
+      }
+
     };
 
     socket.on("quiz_ended", handleQuizEnd);
+
     return () => socket.off("quiz_ended", handleQuizEnd);
 
-  }, []);
+  }, [mode, timerType]);
 
-  useEffect(() => {
-    if (!quizEnded) return;
+  // useEffect(() => {
+  //   if (!quizEnded) return;
 
-    localStorage.removeItem("quiz_meta");
-    localStorage.removeItem("quiz_q_index");
-    localStorage.removeItem("quiz_phase");
-    localStorage.removeItem("quiz_remaining_time");
-    localStorage.removeItem("quiz_end_time");
-    localStorage.removeItem("manual_start_time");
+  //   localStorage.removeItem("quiz_meta");
+  //   localStorage.removeItem("quiz_q_index");
+  //   localStorage.removeItem("quiz_phase");
+  //   localStorage.removeItem("quiz_remaining_time");
+  //   localStorage.removeItem("quiz_end_time");
+  //   localStorage.removeItem("manual_start_time");
 
-    navigate(
-      `/class/${joinCode}/lobby/quiz/${activitySessionId}/end`,
-      {
-        state: { activitySessionId, studentId }
-      }
-    );
+  //   navigate(
+  //     `/class/${joinCode}/lobby/quiz/${activitySessionId}/end`,
+  //     {
+  //       state: { activitySessionId, studentId }
+  //     }
+  //   );
 
-  }, [quizEnded]);
+  // }, [quizEnded]);
 
   useEffect(() => {
     if (!activitySessionId) return;
@@ -815,7 +852,29 @@ export default function QuizPage() {
       setLocalPhase("question");
       setIsCorrect(null);
     } else {
-      setQuizEnded(true);
+
+      console.log("🎉 quiz finished → go to end page");
+
+      if (mode === "team") {
+
+        navigate(
+          `/class/${joinCode}/lobby/quiz/${activitySessionId}/endteam`,
+          {
+            state: { activitySessionId, studentId }
+          }
+        );
+
+      } else {
+
+        navigate(
+          `/class/${joinCode}/lobby/quiz/${activitySessionId}/end`,
+          {
+            state: { activitySessionId, studentId }
+          }
+        );
+
+      }
+
     }
   };
 
@@ -857,6 +916,39 @@ export default function QuizPage() {
 
   }, [joinCode]);
 
+
+  useEffect(() => {
+
+    const handler = () => {
+
+      console.log("⚡ force_submit received");
+
+      if (localPhase !== "question") return;
+
+      const key = `question_start_ts_${questionIndex}`;
+      const startTs = Number(localStorage.getItem(key));
+      const now = Date.now();
+
+      let finalTimeSpent = 0;
+
+      if (startTs && now > startTs) {
+        finalTimeSpent = Math.floor((now - startTs) / 1000);
+      }
+
+      submitAnswer({
+        selectedIds: [],
+        timeSpent: finalTimeSpent,
+        questionType: question.Question_Type
+      });
+
+    };
+
+    socket.on("force_submit", handler);
+
+    return () => socket.off("force_submit", handler);
+
+  }, [localPhase, questionIndex, question]);
+
   /* ================= RENDER ================= */
 
   if (!questions.length) {
@@ -868,7 +960,7 @@ export default function QuizPage() {
       <RankingPage
         activitySessionId={activitySessionId}
         studentId={studentId}
-        username="Aka"
+        mode={mode}
       />
     );
   }

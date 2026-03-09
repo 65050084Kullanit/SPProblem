@@ -75,47 +75,74 @@ function JoinRoom() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen overflow-hidden gap-4 text-center">
-      {/* <Sidebar /> */}
-      <h1 className="text-2xl font-bold mb-6">Join Room</h1>
-      <p className="text-xs text-gray-600 mb-8">
-        Join a room using the code provided by your teacher.
-      </p>
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-6">
+      <div className="w-full max-w-md bg-slate-800 border border-slate-700 rounded-2xl p-8 space-y-6">
 
-      <input
-        type="text"
-        placeholder="Enter Room Code"
-        value={code}
-        onChange={(e) => {
-          setCode(e.target.value);
-          setError("");        // ⭐ เคลียร์ error ทันทีเมื่อเริ่มพิมพ์ใหม่
-        }}
-        className="text-sm w-[299px] h-[61px] px-4 py-2 mb-2 bg-gray-300 border border-gray-500 rounded-md focus:ring-1 focus:ring-gray-700 outline-none"
-      />
+        {/* Title */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-bold text-slate-100">
+            Join Room
+          </h1>
+          <p className="text-sm text-slate-400">
+            Enter the code provided by your teacher
+          </p>
+        </div>
 
-      {/* ⭐ Show error message below input */}
-      {error && (
-        <p className="text-red-500 text-sm mb-4">{error}</p>
-      )}
+        {/* Input */}
+        <div className="space-y-2">
+          <input
+            type="text"
+            placeholder="Enter Room Code"
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value);
+              setError("");
+            }}
+            className="
+              w-full px-4 py-3
+              bg-slate-900
+              border border-slate-700
+              rounded-xl
+              text-slate-100
+              placeholder-slate-500
+              focus:outline-none
+              focus:ring-2 focus:ring-cyan-400
+              transition-all duration-200
+            "
+          />
 
-      <button
-        onClick={handleJoin}
-        className="text-base w-[135px] h-[46px] bg-gray-300 text-black py-2 rounded-md border border-gray-700 hover:bg-gray-600 transition duration-200"
-      >
-        Join
-      </button>
+          {error && (
+            <p className="text-rose-500 text-sm text-center">
+              {error}
+            </p>
+          )}
+        </div>
 
-
-      {/* 👩‍🏫 Teacher Sign in (sub action) */}
-      <p className="text-xs text-gray-600 mt-3">
-        Are you a teacher?{" "}
-        <span
-          onClick={() => navigate("/teacher/signin")}
-          className="underline cursor-pointer hover:text-black"
+        {/* Join Button */}
+        <button
+          onClick={handleJoin}
+          className="
+            w-full py-3 rounded-xl
+            bg-cyan-400 text-slate-900 font-semibold
+            hover:bg-cyan-300
+            transition-all duration-200
+          "
         >
-          Sign in here
-        </span>
-      </p>
+          Join Room
+        </button>
+
+        {/* Teacher Sign in */}
+        <p className="text-sm text-slate-400 text-center">
+          Are you a teacher?{" "}
+          <span
+            onClick={() => navigate("/teacher/signin")}
+            className="text-cyan-400 hover:text-cyan-300 cursor-pointer transition"
+          >
+            Sign in here
+          </span>
+        </p>
+
+      </div>
     </div>
   );
 }

@@ -6,8 +6,12 @@ import StudentID from "./pages/StudentID";
 import SelectAvatar from "./pages/SelectAvatar";
 import Lobby from "./pages/Lobby";
 import QuizPage from "./pages/QuizPage";
-import EndQuizPage from "./pages/EndQuizPage";
+import EndQuizPageIndividual from "./pages/EndQuizPageIndividual";
+import EndQuizPageTeam from "./pages/EndQuizPageTeam";
+import TeamRanking from "./pages/FinalTeamRankingPage";
+import FinalIndividualRankingPage from "./pages/FinalIndividualRankingPage";
 import GameAnalysis from "./pages/GameAnalysis";
+import StudentTeamPreviewPage from "./pages/StudentTeamPreviewPage";
 
 
 import OneAnsQuizPage from "./pages/OneAnsQuizPage3";
@@ -37,12 +41,16 @@ function App() {
         <Route path="/class/:joinCode" element={<StudentID />} />
         <Route path="/class/:joinCode/student/:studentId/avatar" element={<SelectAvatar />} />
         <Route path="/class/:joinCode/lobby" element={<Lobby />} />
+        <Route path="/class/:joinCode/lobby/team/:activitySessionId" element={<StudentTeamPreviewPage />} />
         <Route path="/class/:joinCode/lobby/quiz/:activitySessionId" element={<QuizPage />} />
-        <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end" element={<EndQuizPage />} />
+        <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end" element={<EndQuizPageIndividual />} />
+        <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/endteam" element={<EndQuizPageTeam />} />
+        <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end/team" element={<TeamRanking />} />
+        <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end/ranking" element={<FinalIndividualRankingPage />} />
         <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/end/analysis" element={<GameAnalysis />} />
         <Route path="/class/:joinCode/lobby/quiz/:activitySessionId/ranking" element={<RankingPage />} />
 
-        <Route path="/1quiz" element={<OneAnsQuizPage />} />
+        {/* <Route path="/1quiz" element={<OneAnsQuizPage />} />
         <Route path="/mquiz" element={<MultiAnsQuizPage />} />
         <Route path="/ansresult" element={<AnswerResultPage />} />
         <Route path="/endquiz" element={<EndQuizPage />} />
@@ -52,7 +60,7 @@ function App() {
         <Route path="/1square" element={<OneSquare />} />
         <Route path="/1square2" element={<OneSquare2 />} />
         <Route path="/msquare" element={<MultiSquare />} />
-        <Route path="/msquare2" element={<MultiSquare2 />} />
+        <Route path="/msquare2" element={<MultiSquare2 />} /> */}
 
 
 

@@ -149,7 +149,7 @@ const Lobby = () => {
   const savedPlayer = localStorage.getItem("student_meta");
   const playerData = savedPlayer ? JSON.parse(savedPlayer) : null;
   const currentUser = playerData;
-  
+  const [quizPayload, setQuizPayload] = useState(null);
 
 
   // useEffect(() => {
@@ -191,17 +191,17 @@ const Lobby = () => {
       setPlayers(playersInRoom);
     };
 
-    const handlePlayerJoined = (newPlayer) => {
-      setPlayers((prev) => {
-        const exists = prev.some((p) =>
-          String(p.studentId) === String(newPlayer.studentId)
-        );
-        return exists ? prev : [...prev, newPlayer];
-      });
-    };
+    // const handlePlayerJoined = (newPlayer) => {
+    //   setPlayers((prev) => {
+    //     const exists = prev.some((p) =>
+    //       String(p.studentId) === String(newPlayer.studentId)
+    //     );
+    //     return exists ? prev : [...prev, newPlayer];
+    //   });
+    // };
 
     socket.on("room-players", handleRoomPlayers);
-    socket.on("player-joined", handlePlayerJoined);
+    // socket.on("player-joined", handlePlayerJoined);
 
     socket.emit("join-room", {
       joinCode,
@@ -210,7 +210,7 @@ const Lobby = () => {
 
     return () => {
       socket.off("room-players", handleRoomPlayers);
-      socket.off("player-joined", handlePlayerJoined);
+      // socket.off("player-joined", handlePlayerJoined);
     };
   }, [joinCode]);   // ❗ เอา playerData ออก  
 
@@ -252,9 +252,33 @@ const Lobby = () => {
 
 
   useEffect(() => {
+
+    const activitySessionId = localStorage.getItem("activity_session");
+
+    if (activitySessionId && playerData) {
+
+      console.log("🔁 rejoin activity after refresh");
+
+      socket.emit("join_activity", {
+        activitySessionId,
+        studentId: playerData.studentId
+      });
+
+    }
+
+  }, []);
+
+
+  useEffect(() => {
     const handler = (payload) => {
       console.log("🎯 activity_started", payload);
       console.log("activity_started payload =", payload);
+
+      localStorage.setItem(
+        "activity_session",
+        payload.activitySessionId
+      );
+
 
        // 🔥 เข้าห้อง activity ทันที
       socket.emit("join_activity", {
@@ -263,19 +287,31 @@ const Lobby = () => {
       });
 
     
-      navigate(`/class/${joinCode}/lobby/quiz/${payload.activitySessionId}`,{
-          state: {
-            questions: payload.questions,
-            totalQuestions: payload.questions.length,
-            timeLimit: payload.timeLimit,
-            timerType: payload.timerType,
-            activitySessionId: payload.activitySessionId,
-            quizId: payload.quizId,           // ✅ เพิ่ม
-            studentId: playerData.studentId,        // ✅ เพิ่ม
-            quizStartTime: payload.quizStartTime,
-            serverTime: payload.serverTime
+      setQuizPayload(payload);   // ⭐ เก็บ payload ไว้ก่อน
+
+      if (payload.mode == "individual") {
+
+        navigate(`/class/${joinCode}/lobby/quiz/${payload.activitySessionId}`,{
+          state:{
+            ...payload,
+            studentId: playerData.studentId
           }
-      });
+        });
+
+      }
+      // navigate(`/class/${joinCode}/lobby/quiz/${payload.activitySessionId}`,{
+      //     state: {
+      //       questions: payload.questions,
+      //       totalQuestions: payload.questions.length,
+      //       timeLimit: payload.timeLimit,
+      //       timerType: payload.timerType,
+      //       activitySessionId: payload.activitySessionId,
+      //       quizId: payload.quizId,           // ✅ เพิ่ม
+      //       studentId: playerData.studentId,        // ✅ เพิ่ม
+      //       quizStartTime: payload.quizStartTime,
+      //       serverTime: payload.serverTime
+      //     }
+      // });
     };
 
     socket.on("activity_started", handler);
@@ -283,6 +319,29 @@ const Lobby = () => {
     return () => socket.off("activity_started", handler);
   }, [joinCode]);
 
+  useEffect(() => {
+
+    const handleTeamsCreated = ({ activitySessionId, teams }) => {
+
+      console.log("teams_created", teams);
+
+      navigate(`/class/${joinCode}/lobby/team/${activitySessionId}`,{
+        state:{
+          ...quizPayload,
+          teams,
+          studentId: playerData.studentId
+        }
+      });
+
+    };
+
+    socket.on("teams_created", handleTeamsCreated);
+
+    return () => {
+      socket.off("teams_created", handleTeamsCreated);
+    };
+
+  }, [quizPayload]);
 
   useEffect(() => {
     const handler = () => {

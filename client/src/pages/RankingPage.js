@@ -103,13 +103,13 @@ import { Crown } from "lucide-react";
 import { socket } from "../socket";
 
 
-function RankingPage() {
+function RankingPage({ activitySessionId, studentId, mode }) {
 
-  const location = useLocation();
+  // const location = useLocation();
   const navigate = useNavigate();
   const { joinCode } = useParams();
 
-  const { activitySessionId, studentId } = location.state || {};
+  // const { activitySessionId, studentId, mode } = location.state || {};
 
   const [myRank, setMyRank] = useState(null);
   const savedPlayer = localStorage.getItem("student_meta");
@@ -117,6 +117,13 @@ function RankingPage() {
 
   const [avatar, setAvatar] = useState(null);
   const [stageName, setStageName] = useState(null);
+
+  const isTeamMode = mode === "team";
+
+  const [teamName, setTeamName] = useState(null);
+  const [teamScore, setTeamScore] = useState(null);
+  const [teamRank, setTeamRank] = useState(null);
+  const displayRank = isTeamMode ? teamRank : myRank;
 
   useEffect(() => {
     if (!studentId) return;
@@ -144,8 +151,23 @@ function RankingPage() {
       studentId
     });
 
-    const handler = ({ rank }) => {
-      setMyRank(rank);
+    const handler = ({ rank, teamRank, teamScore, teamName }) => {
+
+      if (rank !== undefined) {
+        setMyRank(rank);
+      }
+
+      if (teamRank !== undefined) {
+        setTeamRank(teamRank);
+      }
+
+      if (teamScore !== undefined) {
+        setTeamScore(teamScore);
+      }
+
+      if (teamName !== undefined) {
+        setTeamName(teamName);
+      }
     };
 
     socket.on("my_rank_update", handler);
@@ -180,19 +202,21 @@ function RankingPage() {
     return <div className="p-10 text-center">Ranking data missing</div>;
   }
 
-  if (myRank === null) {
+  if (displayRank === null) {
     return <div className="p-10 text-center">Calculating rank...</div>;
   }
 
   return (
     <div className="w-full min-h-screen bg-grey-100 flex flex-col items-center pt-[80px] pb-16">
       <Navbar />
+      
 
       <h1 className="text-4xl font-bold mt-8">Ranking</h1>
 
+
       <div className="relative mt-16">
 
-        {myRank >= 1 && myRank <= 5 && (
+        {displayRank >= 1 && displayRank <= 5 && (
           <Crown
             className="w-16 h-16 absolute -top-10 left-1/3 -translate-x-1/2 text-yellow-500  animate-bounce z-10"
           />
@@ -207,15 +231,32 @@ function RankingPage() {
 
       </div>
 
-      <p className="text-2xl font-bold mt-4">{stageName}</p>
+      {!isTeamMode ? (
+        // 👤 individual mode
+        <>
+          <p className="text-2xl font-bold mt-4">{stageName}</p>
 
-      <h2 className="text-3xl font-bold mt-6">Your Rank</h2>
-      <div className="flex items-center gap-2 mt-1">
-        <Crown className="w-6 h-6" />
-        <p className="text-2xl font-semibold">
-          #{myRank}
-        </p>
-      </div>
+          <h2 className="text-3xl font-bold mt-6">Your Rank</h2>
+          <div className="flex items-center gap-2 mt-1">
+            <Crown className="w-6 h-6" />
+            <p className="text-2xl font-semibold">#{myRank}</p>
+          </div>
+        </>
+      ) : (
+        // 👥 team mode
+        <>
+          <p className="text-2xl font-bold mt-4">{teamName}</p>
+
+          <h2 className="text-3xl font-bold mt-6">Team Score</h2>
+          <p className="text-3xl font-semibold text-blue-600">{teamScore}</p>
+
+          <h2 className="text-3xl font-bold mt-6">Your Team Rank</h2>
+          <div className="flex items-center gap-2 mt-1">
+            <Crown className="w-6 h-6" />
+            <p className="text-2xl font-semibold">#{teamRank}</p>
+          </div>
+        </>
+      )}
     </div>
   );
 }
